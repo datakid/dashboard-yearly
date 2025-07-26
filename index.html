@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lx dashboard 2 experimental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --accent-primary: #3b82f6;
+            --accent-primary-light: #eff6ff;
+            --accent-secondary: #0ea5e9;
+            --accent-secondary-light: #f0f9ff;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --border-radius: 0.75rem;
+            --transition-speed: 250ms ease-out;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 { font-size: 2.25rem; font-weight: 700; color: var(--accent-primary); margin: 0; }
+        .controls { display: flex; gap: 1rem; align-items: center; }
+
+        .toggle-switch {
+            display: flex;
+            background-color: var(--border-color);
+            border-radius: 99px;
+            padding: 0.25rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .toggle-switch button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .toggle-switch button.active {
+            background-color: var(--card-bg);
+            color: var(--accent-primary);
+            box-shadow: var(--shadow);
+        }
+        
+        .main-controls-panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .year-control-area { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        
+        .select-years-btn {
+            background-color: var(--accent-primary-light);
+            color: var(--accent-primary);
+            border: 1px dashed var(--accent-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+        .select-years-btn:hover { background-color: var(--accent-primary); color: white; border-style: solid; }
+        
+        #selectedYearsContainer { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        
+        .year-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--accent-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .remove-tag-btn {
+            background: none;
+            border: none;
+            color: white;
+            opacity: 0.7;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: opacity var(--transition-speed);
+        }
+        .remove-tag-btn:hover { opacity: 1; }
+
+        .filters-area {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            transition: grid-template-columns var(--transition-speed);
+            align-items: start;
+        }
+
+        .filters-area.single-view { grid-template-columns: 1fr; }
+        .filters-area.compare-view { grid-template-columns: 1fr auto 1fr; }
+
+        .comparison-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding-top: 4rem;
+        }
+        .comparison-divider span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background-color: var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-set {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-set h3 {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--border-color);
+        }
+
+        .filter-set.side-a { border-top: 3px solid var(--accent-primary); }
+        .filter-set.side-b { border-top: 3px solid var(--accent-secondary); }
+        .filter-set.side-a h3 { color: var(--accent-primary); }
+        .filter-set.side-b h3 { color: var(--accent-secondary); }
+        
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+        .filter-group { position: relative; }
+
+        .filter-group label {
+            position: absolute; top: -0.65rem; left: 0.75rem; background-color: var(--card-bg);
+            padding: 0 0.25rem; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+        }
+
+        .filter-group select {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+            border-radius: 0.5rem; background-color: var(--card-bg); font-size: 0.9rem;
+            font-weight: 500; color: var(--text-primary); appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.75rem center;
+            cursor: pointer; transition: border-color var(--transition-speed);
+        }
+        .filter-group select:focus {
+            outline: none; border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-primary-light);
+        }
+
+        .results-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .results-table { width: 100%; border-collapse: collapse; }
+        .results-table th, .results-table td {
+            padding: 1rem 1.25rem; text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .results-table thead th {
+            background-color: var(--accent-primary-light); font-weight: 600;
+            font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--accent-primary); position: sticky; top: 0; z-index: 10;
+        }
+        .results-table thead th.col-side-b {
+            background-color: var(--accent-secondary-light); color: var(--accent-secondary);
+        }
+        .results-table tbody tr:last-child td { border-bottom: none; }
+        .results-table tbody tr:hover { background-color: #f9fafb; }
+        .metric-name { font-weight: 600; }
+        .numeric { text-align: right; font-variant-numeric: tabular-nums; }
+        
+        .comparison-cell {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 0.5rem; font-weight: 600;
+        }
+        .comparison-cell.positive { color: var(--positive); }
+        .comparison-cell.negative { color: var(--negative); }
+
+        .no-data-message, .loader { padding: 4rem; text-align: center; color: var(--text-secondary); font-size: 1.1rem; }
+
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity var(--transition-speed);
+        }
+        .popup-overlay.visible { display: flex; opacity: 1; }
+
+        .popup-content {
+            background-color: var(--card-bg); border-radius: var(--border-radius);
+            width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; max-height: 80vh;
+            transform: scale(0.95); transition: transform var(--transition-speed);
+        }
+        .popup-overlay.visible .popup-content { transform: scale(1); }
+
+        .popup-header {
+            padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .popup-header h2 { margin: 0; font-size: 1.25rem; }
+        .popup-close-btn {
+            background:none; border:none; font-size: 1.5rem;
+            cursor:pointer; color: var(--text-secondary);
+        }
+
+        .popup-toolbar {
+            padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);
+            display: flex; flex-wrap: wrap; gap: 1rem;
+        }
+        .popup-search {
+            flex-grow: 1; padding: 0.5rem; border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+        }
+        .popup-toolbar button {
+            padding: 0.5rem 1rem; border: 1px solid var(--border-color);
+            border-radius: 0.5rem; background-color: var(--bg-color);
+            cursor: pointer; font-weight: 500;
+        }
+        
+        .popup-list { overflow-y: auto; padding: 1rem 1.5rem; }
+        .popup-list-item {
+            display: flex; align-items: center; padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9; cursor: pointer;
+        }
+        .popup-list-item:last-child { border-bottom: none; }
+        .popup-list-item input[type="checkbox"] { margin-right: 1rem; width: 1rem; height: 1rem; }
+        .popup-list-item.hidden { display: none; }
+
+        .popup-footer {
+            padding: 1rem 1.5rem; border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+        .popup-done-btn {
+            background-color: var(--accent-primary); color: white;
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+            border: none; font-weight: 600; cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .filters-area.compare-view { grid-template-columns: 1fr; }
+            .comparison-divider { display: none; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .filter-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard Experimental</h1>
+            <div class="controls">
+                <div class="toggle-switch">
+                    <button id="singleViewBtn" class="active">Single View</button>
+                    <button id="compareViewBtn">Compare</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-controls-panel">
+            <div class="year-control-area">
+                <button class="select-years-btn" id="selectYearsBtn">Select Years</button>
+                <div id="selectedYearsContainer"></div>
+            </div>
+        </div>
+
+        <div id="filtersArea" class="filters-area"></div>
+        <div id="resultsContainer" class="results-container"></div>
+    </div>
+    
+    <div class="popup-overlay" id="yearSelectorPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2>Select Years</h2>
+                <button class="popup-close-btn" id="closePopupBtn">×</button>
+            </div>
+            <div class="popup-toolbar">
+                <input type="search" id="yearSearchInput" class="popup-search" placeholder="Filter years...">
+                <button id="sortYearsBtn">Sort ASC/DESC</button>
+                <button id="selectAllYearsBtn">Select All</button>
+                <button id="deselectAllYearsBtn">Deselect All</button>
+            </div>
+            <div class="popup-list" id="yearList"></div>
+            <div class="popup-footer">
+                <button id="donePopupBtn" class="popup-done-btn">Done</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+
+    const state = {
+        allData: [],
+        allYears: [],
+        viewMode: 'single',
+        selectedYears: [],
+        filtersA: { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
+        filtersB: { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
+        yearSortOrder: 'desc',
+    };
+
+    const DOM = {
+        singleViewBtn: document.getElementById('singleViewBtn'),
+        compareViewBtn: document.getElementById('compareViewBtn'),
+        selectYearsBtn: document.getElementById('selectYearsBtn'),
+        selectedYearsContainer: document.getElementById('selectedYearsContainer'),
+        filtersArea: document.getElementById('filtersArea'),
+        resultsContainer: document.getElementById('resultsContainer'),
+        yearPopup: {
+            overlay: document.getElementById('yearSelectorPopup'),
+            content: document.querySelector('.popup-content'),
+            closeBtn: document.getElementById('closePopupBtn'),
+            doneBtn: document.getElementById('donePopupBtn'),
+            searchInput: document.getElementById('yearSearchInput'),
+            sortBtn: document.getElementById('sortYearsBtn'),
+            selectAllBtn: document.getElementById('selectAllYearsBtn'),
+            deselectAllBtn: document.getElementById('deselectAllYearsBtn'),
+            list: document.getElementById('yearList'),
+        },
+    };
+    
+    const METRICS_CONFIG = [
+        'المسكنات', 'مضادات حيوية', 'كلي', 'نفسية و عصبية', 'قلب', 'سكر حقن',
+        'سكر فم', 'نسا', 'كبد', 'جهاز هضمي', 'جهاز تنفسي', 'امراض جلدية',
+        'عيون و رمد', 'انف و اذن', 'مضادات تقلصات', 'اورام', 'فيتامينات', 'مختلفة',
+    ];
+    
+    const MONTH_ORDER = {
+        july: 1, august: 2, september: 3, october: 4, november: 5, december: 6,
+        january: 7, february: 8, march: 9, april: 10, may: 11, june: 12,
+        'يوليو': 1, 'أغسطس': 2, 'سبتمبر': 3, 'أكتوبر': 4, 'نوفمبر': 5, 'ديسمبر': 6,
+        'يناير': 7, 'فبراير': 8, 'مارس': 9, 'أبريل': 10, 'مايو': 11, 'يونيو': 12,
+    };
+    
+    const getMonthOrderValue = (month) => month ? MONTH_ORDER[String(month).trim().toLowerCase()] || 99 : 99;
+
+    const fetchData = async () => {
+        DOM.resultsContainer.innerHTML = '<div class="loader">Loading data...</div>';
+        try {
+            const response = await fetch(SHEET_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const csvText = await response.text();
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    state.allData = results.data.map(row => {
+                        const newRow = {};
+                        for (const key in row) {
+                            if (Object.prototype.hasOwnProperty.call(row, key)) {
+                                const trimmedKey = String(key).trim();
+                                newRow[trimmedKey] = typeof row[key] === 'string' ? String(row[key]).trim() : row[key];
+                            }
+                        }
+                        return newRow;
+                    }).filter(row => row && Object.values(row).some(val => val != null && val !== ''));
+                    initializeApp();
+                }
+            });
+        } catch (error) {
+            DOM.resultsContainer.innerHTML = `<div class="no-data-message">Error loading data. Please check your connection and refresh.</div>`;
+        }
+    };
+    
+    const initializeApp = () => {
+        state.allYears = [...new Set(state.allData.map(row => row.Year))].filter(Boolean);
+        if (state.allYears.length > 0) {
+            state.selectedYears = [state.allYears.sort((a,b) => b-a)[0]];
+        }
+        setupEventListeners();
+        renderLayout();
+    };
+
+    const setupEventListeners = () => {
+        DOM.singleViewBtn.addEventListener('click', () => switchViewMode('single'));
+        DOM.compareViewBtn.addEventListener('click', () => switchViewMode('compare'));
+        DOM.selectYearsBtn.addEventListener('click', openYearPopup);
+        DOM.selectedYearsContainer.addEventListener('click', handleYearTagRemove);
+        DOM.filtersArea.addEventListener('change', handleFilterChange);
+        
+        DOM.yearPopup.overlay.addEventListener('click', (e) => e.target === DOM.yearPopup.overlay && closeYearPopup());
+        DOM.yearPopup.closeBtn.addEventListener('click', closeYearPopup);
+        DOM.yearPopup.doneBtn.addEventListener('click', () => {
+            updateSelectedYearsFromPopup();
+            closeYearPopup();
+            updateAndRender();
+        });
+        DOM.yearPopup.searchInput.addEventListener('input', (e) => renderYearList(e.target.value));
+        DOM.yearPopup.sortBtn.addEventListener('click', toggleYearSort);
+        DOM.yearPopup.selectAllBtn.addEventListener('click', () => toggleAllYearsSelection(true));
+        DOM.yearPopup.deselectAllBtn.addEventListener('click', () => toggleAllYearsSelection(false));
+    };
+    
+    const switchViewMode = (mode) => {
+        if (state.viewMode === mode) return;
+        state.viewMode = mode;
+        DOM.singleViewBtn.classList.toggle('active', mode === 'single');
+        DOM.compareViewBtn.classList.toggle('active', mode === 'compare');
+        renderLayout();
+    };
+
+    const openYearPopup = () => {
+        renderYearList();
+        DOM.yearPopup.overlay.classList.add('visible');
+    };
+    const closeYearPopup = () => DOM.yearPopup.overlay.classList.remove('visible');
+
+    const renderYearList = (searchTerm = '') => {
+        const sortedYears = [...state.allYears].sort((a, b) => state.yearSortOrder === 'desc' ? b - a : a - b);
+        const filteredYears = sortedYears.filter(year => `${year - 1}-${year}`.includes(searchTerm));
+
+        DOM.yearPopup.list.innerHTML = filteredYears.map(year => `
+            <label class="popup-list-item" for="year-check-${year}">
+                <input type="checkbox" id="year-check-${year}" value="${year}" ${state.selectedYears.includes(year) ? 'checked' : ''}>
+                <span>${year - 1}-${year}</span>
+            </label>
+        `).join('');
+    };
+    
+    const updateSelectedYearsFromPopup = () => {
+        const checkboxes = DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]:checked');
+        state.selectedYears = Array.from(checkboxes).map(cb => cb.value);
+    };
+
+    const toggleYearSort = () => {
+        state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc';
+        renderYearList(DOM.yearPopup.searchInput.value);
+    };
+    
+    const toggleAllYearsSelection = (select) => {
+        const checkboxes = DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = select);
+    };
+
+    const handleYearTagRemove = (e) => {
+        if (e.target.classList.contains('remove-tag-btn')) {
+            const yearToRemove = e.target.dataset.year;
+            state.selectedYears = state.selectedYears.filter(y => y !== yearToRemove);
+            updateAndRender();
+        }
+    };
+    
+    const renderSelectedYearTags = () => {
+        DOM.selectedYearsContainer.innerHTML = state.selectedYears
+            .sort((a,b) => b-a)
+            .map(year => `
+            <span class="year-tag">
+                ${year - 1}-${year}
+                <button class="remove-tag-btn" data-year="${year}">×</button>
+            </span>
+        `).join('');
+    };
+
+    const handleFilterChange = (e) => {
+        if(e.target.tagName === 'SELECT'){
+            const side = e.target.dataset.side;
+            const filterKey = e.target.dataset.filter;
+            const filterValue = e.target.value;
+            
+            const filterState = side === 'A' ? state.filtersA : state.filtersB;
+            filterState[filterKey] = filterValue;
+
+            updateFilterOptions(side, filterKey);
+            updateAndRender();
+        }
+    };
+    
+    const updateFilterOptions = (side, changedFilterKey) => {
+        const filters = ['Region', 'Pharmacy', 'Month', 'Class'];
+        filters.forEach(filterKey => {
+            if (filterKey !== changedFilterKey) populateSingleFilter(side, filterKey);
+        });
+    };
+    
+    const renderLayout = () => {
+        DOM.filtersArea.innerHTML = '';
+        DOM.resultsContainer.innerHTML = '';
+        DOM.filtersArea.className = `filters-area ${state.viewMode}-view`;
+        
+        if (state.viewMode === 'single') {
+            DOM.filtersArea.appendChild(createFilterSet('A', 'Filters'));
+        } else {
+            DOM.filtersArea.appendChild(createFilterSet('A', 'Side A'));
+            DOM.filtersArea.innerHTML += `<div class="comparison-divider"><span>VS</span></div>`;
+            DOM.filtersArea.appendChild(createFilterSet('B', 'Side B'));
+        }
+        updateAndRender();
+    };
+
+    const createFilterSet = (side, title) => {
+        const filterSet = document.createElement('div');
+        filterSet.className = `filter-set side-${side.toLowerCase()}`;
+        filterSet.innerHTML = `<h3>${title}</h3>
+            <div class="filter-grid" id="filterGrid-${side}">
+                ${['Region', 'Pharmacy', 'Month', 'Class'].map(filter => `
+                    <div class="filter-group">
+                        <label for="${filter}Filter-${side}">${filter}</label>
+                        <select id="${filter}Filter-${side}" data-side="${side}" data-filter="${filter}"></select>
+                    </div>`).join('')}
+            </div>`;
+        ['Region', 'Pharmacy', 'Month', 'Class'].forEach(filterKey => populateSingleFilter(side, filterKey, filterSet));
+        return filterSet;
+    };
+    
+    const getAvailableOptions = (filterKey, currentFilters) => {
+        const dataInSelectedYears = state.allData.filter(row => state.selectedYears.includes(row.Year));
+        const uniqueValues = new Set();
+        
+        dataInSelectedYears.forEach(row => {
+            let matches = true;
+            for (const key in currentFilters) {
+                if (key !== filterKey && currentFilters[key] !== 'all' && row[key] !== currentFilters[key]) {
+                    matches = false;
+                    break;
+                }
+            }
+            if(matches && row[filterKey] != null && String(row[filterKey]).trim() !== '') uniqueValues.add(row[filterKey]);
+        });
+        return Array.from(uniqueValues).sort((a,b) => {
+            if (filterKey === 'Month') return getMonthOrderValue(a) - getMonthOrderValue(b);
+            return String(a).localeCompare(String(b), undefined, {numeric: true});
+        });
+    };
+    
+    const populateSingleFilter = (side, filterKey, container = DOM.filtersArea) => {
+        const select = container.querySelector(`#${filterKey}Filter-${side}`);
+        if(!select) return;
+        
+        const currentFilters = side === 'A' ? state.filtersA : state.filtersB;
+        const currentValue = select.value;
+        const options = getAvailableOptions(filterKey, currentFilters);
+
+        select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
+        options.forEach(opt => {
+            const optionEl = document.createElement('option');
+            optionEl.value = optionEl.textContent = opt;
+            select.appendChild(optionEl);
+        });
+
+        select.value = options.includes(currentValue) ? currentValue : 'all';
+        if (!options.includes(currentValue)) currentFilters[filterKey] = 'all';
+    };
+    
+    const getFilteredData = (filters) => {
+        if(state.selectedYears.length === 0) return [];
+        return state.allData.filter(row => 
+            state.selectedYears.includes(row.Year) &&
+            Object.entries(filters).every(([key, value]) => value === 'all' || String(row[key]).trim() === value)
+        );
+    };
+
+    const calculateMetrics = (data) => {
+        const metrics = {
+            'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0,
+            'Active Pharmacies': new Set(data.map(r => r.Pharmacy)).size,
+        };
+        METRICS_CONFIG.forEach(cat => metrics[cat] = 0);
+        data.forEach(row => {
+            metrics['Total Prescriptions'] += parseFloat(row['Total Prescription'] || 0);
+            metrics['Insurance Covered'] += parseFloat(row['Insurance Covered Prescription'] || 0);
+            METRICS_CONFIG.forEach(cat => {
+                const val = parseFloat(row[cat] || 0);
+                metrics[cat] += val;
+                metrics['Total Value'] += val;
+            });
+        });
+        return metrics;
+    };
+    
+    const updateAndRender = () => {
+        renderSelectedYearTags();
+        if(state.selectedYears.length === 0){
+            DOM.resultsContainer.innerHTML = `<div class="no-data-message">Please select at least one year to view data.</div>`;
+            return;
+        }
+        if (state.viewMode === 'single') {
+            renderSingleTable(calculateMetrics(getFilteredData(state.filtersA)));
+        } else {
+            renderCompareTable(calculateMetrics(getFilteredData(state.filtersA)), calculateMetrics(getFilteredData(state.filtersB)));
+        }
+    };
+    
+    const formatNumber = (num) => isNaN(num) ? 'N/A' : num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    
+    const renderSingleTable = (metrics) => {
+        const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
+        DOM.resultsContainer.innerHTML = `<table class="results-table"><thead><tr><th>Metric</th><th class="numeric">Value</th></tr></thead><tbody>${allMetrics.map(metric => `<tr><td class="metric-name">${metric}</td><td class="numeric">${formatNumber(metrics[metric])}</td></tr>`).join('')}</tbody></table>`;
+    };
+    
+    const renderCompareTable = (metricsA, metricsB) => {
+        const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
+        let tableHTML = `<table class="results-table"><thead><tr><th>Metric</th><th class="numeric col-side-a">Side A</th><th class="numeric col-side-b">Side B</th><th class="numeric">Comparison</th></tr></thead><tbody>`;
+
+        allMetrics.forEach(metric => {
+            const valA = metricsA[metric];
+            const valB = metricsB[metric];
+            const diff = valB - valA;
+            const perc = valA !== 0 ? (diff / valA) * 100 : (valB > 0 ? Infinity : 0);
+            const diffClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : '');
+            
+            let comparisonContent = '–';
+            if (diff !== 0) {
+                const arrow = diff > 0 ? '▲' : '▼';
+                const percText = isFinite(perc) ? `${diff > 0 ? '+' : ''}${perc.toFixed(1)}%` : '∞';
+                comparisonContent = `${arrow} ${percText}`;
+            }
+
+            tableHTML += `<tr><td class="metric-name">${metric}</td>
+                <td class="numeric">${formatNumber(valA)}</td>
+                <td class="numeric">${formatNumber(valB)}</td>
+                <td class="numeric comparison-cell ${diffClass}" title="Change: ${formatNumber(diff)}">
+                   ${comparisonContent}
+                </td></tr>`;
+        });
+        DOM.resultsContainer.innerHTML = tableHTML + `</tbody></table>`;
+    };
+    
+    fetchData();
+});
+</script>
+</body>
+</html>
