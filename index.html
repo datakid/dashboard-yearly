@@ -4,170 +4,810 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Experimental</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root {
-            --bg-color: #f0f2f5;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-bg-solid: #ffffff;
-            --text-primary: #0d1117;
-            --text-secondary: #586069;
-            --border-color: #d0d7de;
-            --accent-primary: #0969da;
-            --accent-primary-light: #ddf4ff;
-            --accent-secondary: #1a7f37;
-            --accent-secondary-light: #dcfce7;
-            --positive: #1a7f37;
-            --negative: #d73a49;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --border-radius: 0.75rem;
-            --transition-speed: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            --backdrop-blur: blur(12px);
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --bg-accent: #e0f2fe;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --text-light: #ffffff;
+            
+            --accent-primary: #0ea5e9;
+            --accent-primary-light: #bae6fd;
+            --accent-primary-dark: #0284c7;
+            --accent-secondary: #8b5cf6;
+            --accent-secondary-light: #ddd6fe;
+            --accent-secondary-dark: #7c3aed;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            
+            --border-primary: #e2e8f0;
+            --border-secondary: #cbd5e1;
+            --border-accent: #0ea5e9;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+            
+            --radius-sm: 8px;
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s ease;
         }
-        *, *::before, *::after { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
         body {
-            font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary);
-            margin: 0; padding: 2.5rem; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: 1.5rem;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
         }
-        .container { max-width: 1600px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
-        .card {
-            background-color: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: var(--border-radius); box-shadow: var(--shadow);
-            -webkit-backdrop-filter: var(--backdrop-blur); backdrop-filter: var(--backdrop-blur);
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
         }
+
         .header {
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
         }
-        .header h1 { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin: 0; }
-        .controls { display: flex; gap: 1rem; align-items: center; }
-        .toggle-switch { display: flex; background-color: #e9ecef; border-radius: 99px; padding: 0.25rem; }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            margin: 0;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .toggle-switch {
+            display: flex;
+            background-color: var(--bg-tertiary);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
         .toggle-switch button {
-            padding: 0.5rem 1.25rem; border: none; background-color: transparent;
-            font-weight: 600; border-radius: 99px; cursor: pointer; transition: all var(--transition-speed);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background-color: transparent;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
             color: var(--text-secondary);
+            position: relative;
+            z-index: 2;
+            font-size: 0.9rem;
         }
-        .toggle-switch button.active { background-color: var(--card-bg-solid); color: var(--accent-primary); box-shadow: var(--shadow-sm); }
+
+        .toggle-switch button.active {
+            color: white;
+        }
+
+        .toggle-indicator {
+            position: absolute;
+            top: 4px;
+            height: calc(100% - 8px);
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            transition: var(--transition);
+            z-index: 1;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch .active:nth-child(1) ~ .toggle-indicator {
+            left: 4px;
+            width: calc(50% - 4px);
+        }
+
+        .toggle-switch .active:nth-child(2) ~ .toggle-indicator {
+            left: calc(50% + 4px);
+            width: calc(50% - 4px);
+        }
+
         .export-btn {
-            background-color: var(--positive); color: white; padding: 0.6rem 1.25rem;
-            border: none; font-weight: 600; border-radius: 0.5rem; cursor: pointer;
-            transition: all var(--transition-speed); box-shadow: var(--shadow-sm);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            font-size: 0.9rem;
         }
-        .export-btn:hover { background-color: #176f32; box-shadow: var(--shadow); transform: translateY(-2px); }
-        .main-controls-panel { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
-        .scope-title { font-weight: 600; color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .year-control-area { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .export-btn i {
+            font-size: 1rem;
+        }
+
+        .main-controls-panel {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .scope-title {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .scope-title::before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+        }
+
+        .year-control-area {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
         .select-years-btn {
-            background-color: var(--accent-primary-light); color: var(--accent-primary);
-            border: 1px solid var(--accent-primary); padding: 0.6rem 1.25rem; border-radius: 99px;
-            font-weight: 600; cursor: pointer; transition: all var(--transition-speed);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            font-size: 0.9rem;
+            border: none;
         }
-        .select-years-btn:hover { background-color: var(--accent-primary); color: white; box-shadow: var(--shadow-sm); }
-        #selectedYearsContainer { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+        .select-years-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .select-years-btn i {
+            font-size: 1rem;
+        }
+
+        #selectedYearsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
         .year-tag {
-            display: inline-flex; align-items: center; gap: 0.5rem; background-color: var(--accent-primary);
-            color: white; padding: 0.3rem 0.8rem; border-radius: 99px; font-weight: 500; font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-sm);
         }
+
         .remove-tag-btn {
-            background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer;
-            padding: 0; width: 18px; height: 18px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; transition: background-color var(--transition-speed);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
         }
-        .remove-tag-btn svg { width: 12px; height: 12px; }
-        .remove-tag-btn:hover { background: rgba(255,255,255,0.4); }
-        .filters-area { display: grid; gap: 2rem; transition: grid-template-columns var(--transition-speed); align-items: start; }
-        .filters-area.single-view { grid-template-columns: 1fr; }
-        .filters-area.compare-view { grid-template-columns: 1fr auto 1fr; }
-        .comparison-divider { display: flex; align-items: center; justify-content: center; height: 100%; padding-top: 5rem; }
-        .comparison-divider span { font-size: 1.5rem; font-weight: 700; color: var(--text-secondary); background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
-        .filter-set { padding: 1.5rem; }
-        .filter-set h3.filter-set-title {
-            margin: 0 0 1.5rem 0; font-size: 1.1rem; font-weight: 600; min-height: 2rem;
-            display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 0.25rem 0.5rem;
+
+        .remove-tag-btn i {
+            font-size: 0.75rem;
         }
-        .filter-set.side-a { border-top: 4px solid var(--accent-primary); }
-        .filter-set.side-b { border-top: 4px solid var(--accent-secondary); }
-        .filter-set-title .title-year { font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .filter-set-title .side-a { color: var(--accent-primary); background-color: var(--accent-primary-light); }
-        .filter-set-title .side-b { color: var(--accent-secondary); background-color: var(--accent-secondary-light); }
-        .filter-set-title .separator { color: var(--text-secondary); font-weight: 400; }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
-        .filter-group { position: relative; }
+
+        .remove-tag-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .filters-area {
+            display: grid;
+            gap: 2rem;
+            transition: grid-template-columns var(--transition);
+        }
+
+        .filters-area.single-view {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-area.compare-view {
+            grid-template-columns: 1fr auto 1fr;
+        }
+
+        .comparison-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding-top: 5rem;
+        }
+
+        .comparison-divider span {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .filter-set {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .filter-set::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+        }
+
+        .filter-set.side-a::before {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-primary-dark));
+        }
+
+        .filter-set.side-b::before {
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-secondary-dark));
+        }
+
+        .filter-set:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .filter-set-title {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            min-height: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 0.25rem 0.5rem;
+        }
+
+        .filter-set-title .title-year {
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .filter-set-title .side-a {
+            color: white;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+        }
+
+        .filter-set-title .side-b {
+            color: white;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-secondary-dark));
+        }
+
+        .filter-set-title .separator {
+            color: var(--text-tertiary);
+            font-weight: 400;
+            margin: 0 0.25rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            position: relative;
+        }
+
         .filter-group label {
-            position: absolute; top: -0.65rem; left: 0.75rem; background-color: var(--card-bg-solid);
-            padding: 0 0.25rem; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+            position: absolute;
+            top: -0.65rem;
+            left: 0.75rem;
+            background-color: var(--bg-secondary);
+            padding: 0 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 1;
+            border-radius: var(--radius-sm);
         }
+
         .filter-group select {
-            width: 100%; padding: 0.85rem; border: 1px solid var(--border-color); border-radius: 0.5rem;
-            background-color: var(--card-bg-solid); font-size: 0.9rem; font-weight: 500; color: var(--text-primary);
-            appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 0.75rem center; cursor: pointer; transition: all var(--transition-speed);
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .filter-group select:hover { border-color: var(--text-secondary); }
-        .filter-group select.side-a:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-primary-light); }
-        .filter-group select.side-b:focus { outline: none; border-color: var(--accent-secondary); box-shadow: 0 0 0 3px var(--accent-secondary-light); }
-        .results-container { overflow-x: auto; }
-        .results-table { width: 100%; border-collapse: collapse; }
-        .results-table th, .results-table td { padding: 1rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+
+        .filter-group select:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Results Container */
+        .results-container {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th, .results-table td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
         .results-table thead th {
-            background-color: #f6f8fa; font-weight: 600; font-size: 0.875rem;
-            text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);
-            position: sticky; top: 0; z-index: 10;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--bg-tertiary);
         }
-        .results-table thead th.numeric-header { text-align: right; }
-        .results-table thead th.col-side-b { background-color: var(--accent-secondary-light); }
-        .results-table tbody tr:last-child td { border-bottom: none; }
-        .results-table tbody tr:nth-child(even) { background-color: #f6f8fa; }
-        .results-table tbody tr:hover { background-color: var(--accent-primary-light); }
-        .metric-name { font-weight: 600; }
-        .numeric { text-align: right; font-variant-numeric: tabular-nums; }
-        .comparison-cell { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; font-weight: 600; }
-        .comparison-cell.positive { color: var(--positive); }
-        .comparison-cell.negative { color: var(--negative); }
-        .no-data-message, .loader { padding: 4rem; text-align: center; color: var(--text-secondary); font-size: 1.1rem; }
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity var(--transition-speed); }
-        .popup-overlay.visible { display: flex; opacity: 1; }
-        .popup-content { background-color: var(--card-bg-solid); border-radius: var(--border-radius); width: 90%; max-width: 500px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 80vh; transform: scale(0.95); transition: transform var(--transition-speed); }
-        .popup-overlay.visible .popup-content { transform: scale(1); }
-        .popup-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .popup-header h2 { margin: 0; font-size: 1.25rem; }
-        .popup-close-btn { background:none; border:none; font-size: 1.5rem; cursor:pointer; color: var(--text-secondary); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-        .popup-close-btn:hover { color: var(--text-primary); }
-        .popup-toolbar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 1rem; }
-        .popup-search { flex-grow: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; }
-        .popup-toolbar button { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: var(--bg-color); cursor: pointer; font-weight: 500; }
-        .popup-list { overflow-y: auto; padding: 1rem 1.5rem; }
-        .popup-list-item { display: flex; align-items: center; padding: 0.75rem; border-bottom: 1px solid #f1f5f9; cursor: pointer; border-radius: 0.5rem; }
-        .popup-list-item:hover { background-color: #f6f8fa; }
-        .popup-list-item:last-child { border-bottom: none; }
-        .popup-list-item input[type="checkbox"] { margin-right: 1rem; width: 1rem; height: 1rem; accent-color: var(--accent-primary); }
-        .popup-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); text-align: right; background-color: #f6f8fa; border-bottom-left-radius: var(--border-radius); border-bottom-right-radius: var(--border-radius); }
-        .popup-done-btn { background-color: var(--accent-primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; transition: background-color var(--transition-speed); }
-        .popup-done-btn:hover { background-color: #085cc4; }
-        @media (max-width: 900px) { .filters-area.compare-view { grid-template-columns: 1fr; } .comparison-divider { display: none; } }
-        @media (max-width: 768px) { body { padding: 1rem; } .header { flex-direction: column; align-items: flex-start; } .filter-grid { grid-template-columns: 1fr; } }
+
+        .results-table thead th.numeric-header {
+            text-align: right;
+        }
+
+        .results-table thead th.col-side-a {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.05));
+            color: var(--accent-primary-dark);
+        }
+
+        .results-table thead th.col-side-b {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05));
+            color: var(--accent-secondary-dark);
+        }
+
+        .results-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table tbody tr:nth-child(even) {
+            background-color: var(--bg-tertiary);
+        }
+
+        .results-table tbody tr:hover {
+            background-color: var(--bg-accent);
+            transition: background-color var(--transition);
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+        }
+
+        .comparison-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .comparison-cell.positive {
+            color: var(--accent-success);
+        }
+
+        .comparison-cell.negative {
+            color: var(--accent-danger);
+        }
+
+        .no-data-message, .loader {
+            padding: 4rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .popup-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .popup-content {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+        }
+
+        .popup-overlay.visible .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.05), transparent);
+        }
+
+        .popup-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .popup-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .popup-close-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .popup-toolbar {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .popup-search {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .popup-search:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .popup-toolbar button {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        .popup-toolbar button:hover {
+            background-color: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .popup-list {
+            overflow-y: auto;
+            padding: 1rem 1.5rem;
+        }
+
+        .popup-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .popup-list-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .popup-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .popup-list-item input[type="checkbox"] {
+            margin-right: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+        }
+
+        .popup-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-primary);
+            text-align: right;
+            background-color: var(--bg-tertiary);
+        }
+
+        .popup-done-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .popup-done-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .filters-area.compare-view {
+                grid-template-columns: 1fr;
+            }
+            .comparison-divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header"><h1>Dashboard Experimental</h1><div class="controls"><div class="toggle-switch"><button id="singleViewBtn" class="active">Single View</button><button id="compareViewBtn">Compare</button></div><button id="exportBtn" class="export-btn">Export CSV</button></div></header>
-        <section class="main-controls-panel card" id="mainControlsPanel"><div class="scope-title">Single View: Year-over-Year Scope</div><div class="year-control-area"><button class="select-years-btn" id="selectYearsBtn">Select Years</button><div id="selectedYearsContainer"></div></div></section>
+        <header class="header">
+            <h1>Analytics Dashboard</h1>
+            <div class="controls">
+                <div class="toggle-switch">
+                    <button id="singleViewBtn" class="active">Single View</button>
+                    <button id="compareViewBtn">Compare</button>
+                    <div class="toggle-indicator"></div>
+                </div>
+                <button id="exportBtn" class="export-btn">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </button>
+            </div>
+        </header>
+        
+        <section class="main-controls-panel" id="mainControlsPanel">
+            <div class="scope-title">Single View: Year-over-Year Scope</div>
+            <div class="year-control-area">
+                <button class="select-years-btn" id="selectYearsBtn">
+                    <i class="fas fa-calendar-alt"></i>
+                    Select Years
+                </button>
+                <div id="selectedYearsContainer"></div>
+            </div>
+        </section>
+        
         <section id="filtersArea" class="filters-area"></section>
-        <section id="resultsContainer" class="results-container card"></section>
+        
+        <section id="resultsContainer" class="results-container"></section>
     </div>
-    <div class="popup-overlay" id="yearSelectorPopup"><div class="popup-content"><div class="popup-header"><h2>Select Years</h2><button class="popup-close-btn" title="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="popup-toolbar"><input type="search" id="yearSearchInput" class="popup-search" placeholder="Filter years..."><button id="sortYearsBtn">Sort ASC/DESC</button><button id="selectAllYearsBtn">Select All</button><button id="deselectAllYearsBtn">Deselect All</button></div><div class="popup-list" id="yearList"></div><div class="popup-footer"><button id="donePopupBtn" class="popup-done-btn">Done</button></div></div></div>
+    
+    <div class="popup-overlay" id="yearSelectorPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2>Select Years</h2>
+                <button class="popup-close-btn" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="popup-toolbar">
+                <input type="search" id="yearSearchInput" class="popup-search" placeholder="Filter years...">
+                <button id="sortYearsBtn">Sort ASC/DESC</button>
+                <button id="selectAllYearsBtn">Select All</button>
+                <button id="deselectAllYearsBtn">Deselect All</button>
+            </div>
+            <div class="popup-list" id="yearList"></div>
+            <div class="popup-footer">
+                <button id="donePopupBtn" class="popup-done-btn">Done</button>
+            </div>
+        </div>
+    </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-
     const defaultSingleViewFilters = { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' };
     const defaultCompareFilters = { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' };
-
     const state = {
         allData: [],
         allYears: [],
@@ -178,7 +818,6 @@ document.addEventListener('DOMContentLoaded', () => {
         compareFiltersB: { ...defaultCompareFilters },
         yearSortOrder: 'desc',
     };
-
     const DOM = {
         mainControlsPanel: document.getElementById('mainControlsPanel'),
         singleViewBtn: document.getElementById('singleViewBtn'),
@@ -199,14 +838,12 @@ document.addEventListener('DOMContentLoaded', () => {
             list: document.getElementById('yearList'),
         },
     };
-
     const METRICS_CONFIG = [ 'المسكنات', 'مضادات حيوية', 'كلي', 'نفسية و عصبية', 'قلب', 'سكر حقن', 'سكر فم', 'نسا', 'كبد', 'جهاز هضمي', 'جهاز تنفسي', 'امراض جلدية', 'عيون و رمد', 'انف و اذن', 'مضادات تقلصات', 'اورام', 'فيتامينات', 'مختلفة' ];
     const MONTH_ORDER = { july: 1, august: 2, september: 3, october: 4, november: 5, december: 6, january: 7, february: 8, march: 9, april: 10, may: 11, june: 12, 'يوليو': 1, 'أغسطس': 2, 'سبتمبر': 3, 'أكتوبر': 4, 'نوفمبر': 5, 'ديسمبر': 6, 'يناير': 7, 'فبراير': 8, 'مارس': 9, 'أبريل': 10, 'مايو': 11, 'يونيو': 12 };
     const getMonthOrderValue = (month) => month ? MONTH_ORDER[String(month).trim().toLowerCase()] || 99 : 99;
-    const CLOSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-
+    
     const fetchData = async () => {
-        DOM.resultsContainer.innerHTML = '<div class="loader">Loading data...</div>';
+        DOM.resultsContainer.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Loading data...</div>';
         try {
             const response = await fetch(SHEET_URL);
             if (!response.ok) throw new Error('Network response was not ok');
@@ -222,7 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     initializeApp();
                 }
             });
-        } catch (error) { DOM.resultsContainer.innerHTML = `<div class="no-data-message">Error loading data. Please check connection and refresh.</div>`; console.error(error); }
+        } catch (error) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-exclamation-circle"></i> Error loading data. Please check connection and refresh.</div>`; console.error(error); }
     };
     
     const initializeApp = () => {
@@ -231,7 +868,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         renderLayout();
     };
-
     const setupEventListeners = () => {
         DOM.singleViewBtn.addEventListener('click', () => switchViewMode('single'));
         DOM.compareViewBtn.addEventListener('click', () => switchViewMode('compare'));
@@ -257,7 +893,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mode === 'compare') {
             state.compareFiltersA = { ...defaultCompareFilters };
             state.compareFiltersB = { ...defaultCompareFilters };
-
             if (state.allYears.length > 0) {
                 state.compareFiltersA.Year = state.allYears[0];
             }
@@ -269,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderLayout();
     };
-
     const openYearPopup = () => { renderYearList(); DOM.yearPopup.overlay.classList.add('visible'); };
     const closeYearPopup = () => DOM.yearPopup.overlay.classList.remove('visible');
     
@@ -283,8 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleYearSort = () => { state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc'; renderYearList(DOM.yearPopup.searchInput.value); };
     const toggleAllYearsSelection = (select) => { DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = select); };
     const handleYearTagRemove = (e) => { const button = e.target.closest('.remove-tag-btn'); if (button) { const yearToRemove = button.dataset.year; state.analysisScopeYears = state.analysisScopeYears.filter(y => y !== yearToRemove); renderLayout(); } };
-    const renderAnalysisScopeTags = () => { DOM.selectedYearsContainer.innerHTML = state.analysisScopeYears.sort((a,b) => b-a).map(year => `<span class="year-tag">${year - 1}-${year}<button class="remove-tag-btn" data-year="${year}" title="Remove year">${CLOSE_ICON_SVG}</button></span>`).join(''); };
-
+    const renderAnalysisScopeTags = () => { DOM.selectedYearsContainer.innerHTML = state.analysisScopeYears.sort((a,b) => b-a).map(year => `<span class="year-tag">${year - 1}-${year}<button class="remove-tag-btn" data-year="${year}" title="Remove year"><i class="fas fa-times"></i></button></span>`).join(''); };
     const handleFilterChange = (e) => {
         if (e.target.tagName === 'SELECT') {
             const side = e.target.dataset.side;
@@ -292,7 +925,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const filterState = state.viewMode === 'single'
                 ? state.singleViewFilters
                 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-
             filterState[filterKey] = e.target.value;
             if (state.viewMode === 'compare') {
                 updateFilterSetTitle(side);
@@ -315,14 +947,12 @@ document.addEventListener('DOMContentLoaded', () => {
             divider.className = 'comparison-divider';
             divider.innerHTML = '<span>VS</span>';
             const filterSetB = createFilterSet('B');
-
             DOM.filtersArea.appendChild(filterSetA);
             DOM.filtersArea.appendChild(divider);
             DOM.filtersArea.appendChild(filterSetB);
         }
         updateAndRender();
     };
-
     const generateFilterSetTitle = (filters, side) => {
         const titleParts = [];
         let yearText = 'All Years';
@@ -331,7 +961,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Region', 'Pharmacy', 'Month', 'Class'].forEach(key => { if (filters[key] !== 'all') titleParts.push(`<span>${filters[key]}</span>`); });
         return titleParts.join('<span class="separator">·</span>');
     };
-
     const updateFilterSetTitle = (side) => {
         const titleEl = document.getElementById(`filterSetTitle-${side}`);
         if(titleEl) {
@@ -339,22 +968,19 @@ document.addEventListener('DOMContentLoaded', () => {
             titleEl.innerHTML = generateFilterSetTitle(filters, side);
         }
     };
-
     const createFilterSet = (side, title = '') => {
         const filterSet = document.createElement('div');
-        filterSet.className = `filter-set card side-${side.toLowerCase()}`;
+        filterSet.className = `filter-set side-${side.toLowerCase()}`;
         
         let filtersToShow = ['Region', 'Pharmacy', 'Month', 'Class'];
         if (state.viewMode === 'compare') { filtersToShow.unshift('Year'); }
-
         const titleHTML = state.viewMode === 'compare' 
             ? `<h3 id="filterSetTitle-${side}" class="filter-set-title"></h3>`
             : `<h3 class="filter-set-title">${title}</h3>`;
-
         filterSet.innerHTML = `${titleHTML}<div class="filter-grid">${filtersToShow.map(filter => 
             `<div class="filter-group">
                 <label for="${filter}Filter-${side}">${filter}</label>
-                <select id="${filter}Filter-${side}" data-side="${side}" data-filter="${filter}" class="side-${side.toLowerCase()}"></select>
+                <select id="${filter}Filter-${side}" data-side="${side}" data-filter="${filter}"></select>
             </div>`).join('')}</div>`;
         
         filtersToShow.forEach(filterKey => populateSingleFilter(side, filterKey, filterSet));
@@ -378,7 +1004,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const filterState = state.viewMode === 'single'
             ? state.singleViewFilters
             : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-
         const options = getAvailableOptions(filterKey);
         select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
         options.forEach(opt => {
@@ -397,7 +1022,6 @@ document.addEventListener('DOMContentLoaded', () => {
             (filters.Class === 'all' || row.Class === filters.Class)
         );
     };
-
     const calculateMetrics = (data) => {
         const metrics = { 'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0, 'Active Pharmacies': new Set(data.map(r => r.Pharmacy)).size };
         METRICS_CONFIG.forEach(cat => metrics[cat] = 0);
@@ -412,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateAndRender = () => {
         if (state.viewMode === 'single') {
             renderAnalysisScopeTags();
-            if(state.analysisScopeYears.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message">Please select at least one year in the Analysis Scope.</div>`; return; }
+            if(state.analysisScopeYears.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> Please select at least one year in the Analysis Scope.</div>`; return; }
             
             const yearlyMetricsData = {};
             state.analysisScopeYears.forEach(year => {
@@ -429,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const renderSingleTable = (yearlyMetricsData) => {
         const years = Object.keys(yearlyMetricsData).sort((a,b) => b-a);
-        if(years.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message">No data for selected filters.</div>`; return; }
+        if(years.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> No data for selected filters.</div>`; return; }
         const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
         let tableHTML = `<table class="results-table"><thead><tr><th class="metric-header">Metric</th>`;
         years.forEach(year => tableHTML += `<th class="numeric-header">${year-1}-${year}</th>`);
@@ -446,14 +1070,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA));
         const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB));
         const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
-        let tableHTML = `<table class="results-table"><thead><tr><th class="metric-header">Metric</th><th>${generateFilterSetTitle(state.compareFiltersA, 'A')}</th><th class="col-side-b">${generateFilterSetTitle(state.compareFiltersB, 'B')}</th><th class="numeric-header">Comparison</th></tr></thead><tbody>`;
+        let tableHTML = `<table class="results-table"><thead><tr><th class="metric-header">Metric</th><th class="col-side-a">${generateFilterSetTitle(state.compareFiltersA, 'A')}</th><th class="col-side-b">${generateFilterSetTitle(state.compareFiltersB, 'B')}</th><th class="numeric-header">Comparison</th></tr></thead><tbody>`;
         allMetrics.forEach(metric => {
             const [valA, valB] = [metricsA[metric], metricsB[metric]];
             const diff = valB - valA;
             const perc = valA !== 0 ? (diff / Math.abs(valA)) * 100 : (valB > 0 ? Infinity : 0);
             const diffClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : '');
             let comparisonContent = '–';
-            if (diff !== 0) { const arrow = diff > 0 ? '▲' : '▼'; const percText = isFinite(perc) ? `${diff > 0 ? '+' : ''}${perc.toFixed(1)}%` : '∞'; comparisonContent = `${arrow} ${percText}`; }
+            if (diff !== 0) { const arrow = diff > 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>'; const percText = isFinite(perc) ? `${diff > 0 ? '+' : ''}${perc.toFixed(1)}%` : '∞'; comparisonContent = `${arrow} ${percText}`; }
             tableHTML += `<tr><td class="metric-name">${metric}</td><td class="numeric">${formatNumber(valA)}</td><td class="numeric">${formatNumber(valB)}</td><td class="numeric comparison-cell ${diffClass}" title="Change: ${formatNumber(diff)}">${comparisonContent}</td></tr>`;
         });
         DOM.resultsContainer.innerHTML = tableHTML + '</tbody></table>';
@@ -487,7 +1111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dataToExport.length === 0) { alert("No data to export."); return; }
         generateCSV(dataToExport, filename);
     };
-
     const generateCSV = (data, filename) => {
         const csv = Papa.unparse(data);
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
