@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Experimental</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Dashboard arena</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -14,12 +15,10 @@
             --bg-tertiary: #f1f5f9;
             --bg-accent: #e0f2fe;
             --bg-card: rgba(255, 255, 255, 0.9);
-            
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-tertiary: #94a3b8;
             --text-light: #ffffff;
-            
             --accent-primary: #0ea5e9;
             --accent-primary-light: #bae6fd;
             --accent-primary-dark: #0284c7;
@@ -28,22 +27,18 @@
             --accent-secondary-dark: #7c3aed;
             --accent-success: #10b981;
             --accent-danger: #ef4444;
-            
             --border-primary: #e2e8f0;
             --border-secondary: #cbd5e1;
             --border-accent: #0ea5e9;
-            
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
             --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
-            
             --radius-sm: 8px;
             --radius: 16px;
             --radius-lg: 24px;
             --radius-xl: 32px;
-            
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-fast: all 0.2s ease;
         }
@@ -453,7 +448,6 @@
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
-        /* Results Container */
         .results-container {
             background-color: var(--bg-card);
             border-radius: var(--radius-xl);
@@ -547,7 +541,6 @@
             font-size: 1.1rem;
         }
 
-        /* Popup Styles */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -721,13 +714,56 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* Responsive Design */
+        .compare-tables-container {
+            display: flex;
+            gap: 2rem;
+            padding: 1.5rem;
+        }
+
+        .compare-table {
+            flex: 1;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .compare-table.side-a {
+            border: 2px solid var(--accent-primary);
+        }
+
+        .compare-table.side-b {
+            border: 2px solid var(--accent-secondary);
+        }
+
+        .compare-table-header {
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            color: white;
+        }
+
+        .compare-table.side-a .compare-table-header {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dark));
+        }
+
+        .compare-table.side-b .compare-table-header {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-secondary-dark));
+        }
+
+        .compare-table-content {
+            background-color: var(--bg-secondary);
+        }
+
         @media (max-width: 900px) {
             .filters-area.compare-view {
                 grid-template-columns: 1fr;
             }
             .comparison-divider {
                 display: none;
+            }
+            .compare-tables-container {
+                flex-direction: column;
             }
         }
 
@@ -751,7 +787,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>Analytics Dashboard</h1>
+            <h1>Dashboard Arena</h1>
             <div class="controls">
                 <div class="toggle-switch">
                     <button id="singleViewBtn" class="active">Single View</button>
@@ -918,6 +954,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAllYearsSelection = (select) => { DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = select); };
     const handleYearTagRemove = (e) => { const button = e.target.closest('.remove-tag-btn'); if (button) { const yearToRemove = button.dataset.year; state.analysisScopeYears = state.analysisScopeYears.filter(y => y !== yearToRemove); renderLayout(); } };
     const renderAnalysisScopeTags = () => { DOM.selectedYearsContainer.innerHTML = state.analysisScopeYears.sort((a,b) => b-a).map(year => `<span class="year-tag">${year - 1}-${year}<button class="remove-tag-btn" data-year="${year}" title="Remove year"><i class="fas fa-times"></i></button></span>`).join(''); };
+    
+    const getFilteredData = (filters) => {
+        return state.allData.filter(row => 
+            (filters.Year === 'all' || !filters.Year || row.Year === filters.Year) &&
+            (filters.Region === 'all' || row.Region === filters.Region) &&
+            (filters.Pharmacy === 'all' || row.Pharmacy === filters.Pharmacy) &&
+            (filters.Month === 'all' || row.Month === filters.Month) &&
+            (filters.Class === 'all' || row.Class === filters.Class)
+        );
+    };
+
+    const getAvailableOptions = (filterKey, filters) => {
+        const filteredData = getFilteredData(filters);
+        const uniqueValues = new Set(filteredData.map(row => row[filterKey]).filter(val => val != null && String(val).trim() !== ''));
+        return Array.from(uniqueValues).sort((a,b) => {
+            if (filterKey === 'Month') return getMonthOrderValue(a) - getMonthOrderValue(b);
+            if (filterKey === 'Year') return b - a;
+            return String(a).localeCompare(String(b), undefined, {numeric: true});
+        });
+    };
+
+    const updateAllFilters = (side) => {
+        const filterState = state.viewMode === 'single'
+            ? state.singleViewFilters
+            : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
+        
+        const filterSet = DOM.filtersArea.querySelector(`.filter-set.side-${side.toLowerCase()}`);
+        if (!filterSet) return;
+
+        const filterKeys = ['Region', 'Pharmacy', 'Month', 'Class'];
+        if (state.viewMode === 'compare') { filterKeys.unshift('Year'); }
+
+        filterKeys.forEach(filterKey => {
+            const select = filterSet.querySelector(`#${filterKey}Filter-${side}`);
+            if (!select) return;
+            
+            const currentValue = select.value;
+            const options = getAvailableOptions(filterKey, filterState);
+            
+            select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
+            options.forEach(opt => {
+                const displayText = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
+                const option = new Option(displayText, opt);
+                select.add(option);
+            });
+            
+            if (options.includes(currentValue)) {
+                select.value = currentValue;
+            } else {
+                select.value = 'all';
+                filterState[filterKey] = 'all';
+            }
+        });
+    };
+
     const handleFilterChange = (e) => {
         if (e.target.tagName === 'SELECT') {
             const side = e.target.dataset.side;
@@ -925,7 +1016,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const filterState = state.viewMode === 'single'
                 ? state.singleViewFilters
                 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
+            
             filterState[filterKey] = e.target.value;
+            
+            if (filterKey === 'Region') {
+                filterState.Pharmacy = 'all';
+                filterState.Month = 'all';
+            } else if (filterKey === 'Pharmacy') {
+                filterState.Month = 'all';
+            }
+            
+            updateAllFilters(side);
+            
             if (state.viewMode === 'compare') {
                 updateFilterSetTitle(side);
             }
@@ -988,15 +1090,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return filterSet;
     };
     
-    const getAvailableOptions = (filterKey) => {
-        const uniqueValues = new Set(state.allData.map(row => row[filterKey]).filter(val => val != null && String(val).trim() !== ''));
-        return Array.from(uniqueValues).sort((a,b) => {
-            if (filterKey === 'Month') return getMonthOrderValue(a) - getMonthOrderValue(b);
-            if (filterKey === 'Year') return b - a;
-            return String(a).localeCompare(String(b), undefined, {numeric: true});
-        });
-    };
-    
     const populateSingleFilter = (side, filterKey, container) => {
         const select = container.querySelector(`#${filterKey}Filter-${side}`);
         if(!select) return;
@@ -1004,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filterState = state.viewMode === 'single'
             ? state.singleViewFilters
             : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-        const options = getAvailableOptions(filterKey);
+        const options = getAvailableOptions(filterKey, filterState);
         select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
         options.forEach(opt => {
             const displayText = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
@@ -1013,15 +1106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = filterState[filterKey] || 'all';
     };
     
-    const getFilteredData = (filters) => {
-        return state.allData.filter(row => 
-            (filters.Year === 'all' || !filters.Year || row.Year === filters.Year) &&
-            (filters.Region === 'all' || row.Region === filters.Region) &&
-            (filters.Pharmacy === 'all' || row.Pharmacy === filters.Pharmacy) &&
-            (filters.Month === 'all' || row.Month === filters.Month) &&
-            (filters.Class === 'all' || row.Class === filters.Class)
-        );
-    };
     const calculateMetrics = (data) => {
         const metrics = { 'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0, 'Active Pharmacies': new Set(data.map(r => r.Pharmacy)).size };
         METRICS_CONFIG.forEach(cat => metrics[cat] = 0);
@@ -1070,7 +1154,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA));
         const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB));
         const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
-        let tableHTML = `<table class="results-table"><thead><tr><th class="metric-header">Metric</th><th class="col-side-a">${generateFilterSetTitle(state.compareFiltersA, 'A')}</th><th class="col-side-b">${generateFilterSetTitle(state.compareFiltersB, 'B')}</th><th class="numeric-header">Comparison</th></tr></thead><tbody>`;
+        
+        let tableHTML = `<div class="compare-tables-container">`;
+        
+        tableHTML += `<div class="compare-table side-a">`;
+        tableHTML += `<div class="compare-table-header">${generateFilterSetTitle(state.compareFiltersA, 'A').replace(/<[^>]*>/g, ' ').replace(/·/g, ' - ')}</div>`;
+        tableHTML += `<div class="compare-table-content"><table class="results-table"><thead><tr><th>Metric</th><th class="numeric-header">Value</th></tr></thead><tbody>`;
+        allMetrics.forEach(metric => {
+            tableHTML += `<tr><td class="metric-name">${metric}</td><td class="numeric">${formatNumber(metricsA[metric])}</td></tr>`;
+        });
+        tableHTML += `</tbody></table></div></div>`;
+        
+        tableHTML += `<div class="compare-table side-b">`;
+        tableHTML += `<div class="compare-table-header">${generateFilterSetTitle(state.compareFiltersB, 'B').replace(/<[^>]*>/g, ' ').replace(/·/g, ' - ')}</div>`;
+        tableHTML += `<div class="compare-table-content"><table class="results-table"><thead><tr><th>Metric</th><th class="numeric-header">Value</th></tr></thead><tbody>`;
         allMetrics.forEach(metric => {
             const [valA, valB] = [metricsA[metric], metricsB[metric]];
             const diff = valB - valA;
@@ -1078,9 +1175,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const diffClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : '');
             let comparisonContent = '–';
             if (diff !== 0) { const arrow = diff > 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>'; const percText = isFinite(perc) ? `${diff > 0 ? '+' : ''}${perc.toFixed(1)}%` : '∞'; comparisonContent = `${arrow} ${percText}`; }
-            tableHTML += `<tr><td class="metric-name">${metric}</td><td class="numeric">${formatNumber(valA)}</td><td class="numeric">${formatNumber(valB)}</td><td class="numeric comparison-cell ${diffClass}" title="Change: ${formatNumber(diff)}">${comparisonContent}</td></tr>`;
+            tableHTML += `<tr><td class="metric-name">${metric}</td><td class="numeric">${formatNumber(valB)} <span class="comparison-cell ${diffClass}">${comparisonContent}</span></td></tr>`;
         });
-        DOM.resultsContainer.innerHTML = tableHTML + '</tbody></table>';
+        tableHTML += `</tbody></table></div></div>`;
+        
+        tableHTML += `</div>`;
+        DOM.resultsContainer.innerHTML = tableHTML;
     };
     
     const exportData = () => {
