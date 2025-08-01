@@ -333,7 +333,6 @@ flex-wrap: wrap;
 justify-content: flex-start;
 align-items: center;
 gap: 0.25rem 0.5rem;
-/* MODIFICATION: Fixed height to prevent layout shifts */
 height: 4.5rem;
 overflow-y: auto;
 }
@@ -511,7 +510,6 @@ font-size: 1.1rem;
 text-align: center;
 color: white;
 flex-shrink: 0;
-/* MODIFICATION: Fixed height and flex centering for stability */
 height: 5rem;
 padding: 0.5rem 1rem;
 display: flex;
@@ -883,16 +881,9 @@ const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 const defaultSingleViewFilters = { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' };
 const defaultCompareFilters = { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' };
-const state = {
-allData: [],
-allYears: [],
-viewMode: 'single',
-analysisScopeYears: [],
-singleViewFilters: { ...defaultSingleViewFilters },
-compareFiltersA: { ...defaultCompareFilters },
-compareFiltersB: { ...defaultCompareFilters },
-yearSortOrder: 'desc',
-};
+const METRICS_CONFIG = [ 'المسكنات', 'مضادات حيوية', 'كلي', 'نفسية و عصبية', 'قلب', 'سكر حقن', 'سكر فم', 'نسا', 'كبد', 'جهاز هضمي', 'جهاز تنفسي', 'امراض جلدية', 'عيون و رمد', 'انف و اذن', 'مضادات تقلصات', 'اورام', 'فيتامينات', 'مختلفة' ];
+const MONTH_ORDER = { july: 1, august: 2, september: 3, october: 4, november: 5, december: 6, january: 7, february: 8, march: 9, april: 10, may: 11, june: 12, 'يوليو': 1, 'أغسطس': 2, 'سبتمبر': 3, 'أكتوبر': 4, 'نوفمبر': 5, 'ديسمبر': 6, 'يناير': 7, 'فبراير': 8, 'مارس': 9, 'أبريل': 10, 'مايو': 11, 'يونيو': 12 };
+
 const DOM = {
 mainControlsPanel: document.getElementById('mainControlsPanel'),
 singleViewBtn: document.getElementById('singleViewBtn'),
@@ -918,35 +909,48 @@ restoreBtn: document.getElementById('restoreBtn'),
 dismissBtn: document.getElementById('dismissBtn'),
 },
 };
-const METRICS_CONFIG = [ 'المسكنات', 'مضادات حيوية', 'كلي', 'نفسية و عصبية', 'قلب', 'سكر حقن', 'سكر فم', 'نسا', 'كبد', 'جهاز هضمي', 'جهاز تنفسي', 'امراض جلدية', 'عيون و رمد', 'انف و اذن', 'مضادات تقلصات', 'اورام', 'فيتامينات', 'مختلفة' ];
-const MONTH_ORDER = { july: 1, august: 2, september: 3, october: 4, november: 5, december: 6, january: 7, february: 8, march: 9, april: 10, may: 11, june: 12, 'يوليو': 1, 'أغسطس': 2, 'سبتمبر': 3, 'أكتوبر': 4, 'نوفمبر': 5, 'ديسمبر': 6, 'يناير': 7, 'فبراير': 8, 'مارس': 9, 'أبريل': 10, 'مايو': 11, 'يونيو': 12 };
-const getMonthOrderValue = (month) => month ? MONTH_ORDER[String(month).trim().toLowerCase()] || 99 : 99;
-const fetchData = async () => {
-DOM.resultsContainer.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Loading data...</div>';
-try {
-const response = await fetch(SHEET_URL);
-if (!response.ok) throw new Error('Network response was not ok');
-const csvText = await response.text();
-Papa.parse(csvText, {
-header: true, skipEmptyLines: true,
-complete: (results) => {
-state.allData = results.data.map(row => {
-const newRow = {};
-for (const key in row) { if (Object.prototype.hasOwnProperty.call(row, key)) { newRow[String(key).trim()] = typeof row[key] === 'string' ? String(row[key]).trim() : row[key]; } }
-return newRow;
-}).filter(row => row && Object.values(row).some(val => val != null && val !== ''));
-initializeApp();
-}
-});
-} catch (error) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-exclamation-circle"></i> Error loading data. Please check connection and refresh.</div>`; console.error(error); }
+
+const state = {
+allData: [],
+allYears: [],
+viewMode: 'single',
+analysisScopeYears: [],
+singleViewFilters: { ...defaultSingleViewFilters },
+compareFiltersA: { ...defaultCompareFilters },
+compareFiltersB: { ...defaultCompareFilters },
+yearSortOrder: 'desc',
+savedComparisonState: null,
+isDataLoaded: false,
 };
+
+const dataCache = {
+filteredData: new Map(),
+availableOptions: new Map(),
+metrics: new Map(),
+};
+
+const getMonthOrderValue = (month) => month ? MONTH_ORDER[String(month).trim().toLowerCase()] || 99 : 99;
+
+const formatNumber = (num) => isNaN(num) ? 'N/A' : num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+const debounce = (func, wait) => {
+let timeout;
+return function(...args) {
+const context = this;
+clearTimeout(timeout);
+timeout = setTimeout(() => func.apply(context, args), wait);
+};
+};
+
 const initializeApp = () => {
 state.allYears = [...new Set(state.allData.map(row => row.Year))].filter(Boolean).sort((a,b) => b - a);
 state.analysisScopeYears = state.allYears.slice(0, 2);
 setupEventListeners();
 loadSavedComparisonState();
 renderLayout();
+state.isDataLoaded = true;
 };
+
 const setupEventListeners = () => {
 DOM.singleViewBtn.addEventListener('click', () => switchViewMode('single'));
 DOM.compareViewBtn.addEventListener('click', () => switchViewMode('compare'));
@@ -958,13 +962,45 @@ DOM.filtersArea.addEventListener('click', handleFilterReset);
 DOM.yearPopup.overlay.addEventListener('click', (e) => e.target === DOM.yearPopup.overlay && closeYearPopup());
 DOM.yearPopup.closeBtn.addEventListener('click', closeYearPopup);
 DOM.yearPopup.doneBtn.addEventListener('click', () => { updateAnalysisScopeYearsFromPopup(); closeYearPopup(); renderLayout(); });
-DOM.yearPopup.searchInput.addEventListener('input', (e) => renderYearList(e.target.value));
+DOM.yearPopup.searchInput.addEventListener('input', debounce((e) => renderYearList(e.target.value), 300));
 DOM.yearPopup.sortBtn.addEventListener('click', toggleYearSort);
 DOM.yearPopup.selectAllBtn.addEventListener('click', () => toggleAllYearsSelection(true));
 DOM.yearPopup.deselectAllBtn.addEventListener('click', () => toggleAllYearsSelection(false));
 DOM.restoreNotification.restoreBtn.addEventListener('click', restoreComparisonState);
 DOM.restoreNotification.dismissBtn.addEventListener('click', dismissRestoreNotification);
 };
+
+const fetchData = async () => {
+DOM.resultsContainer.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Loading data...</div>';
+try {
+const response = await fetch(SHEET_URL);
+if (!response.ok) throw new Error('Network response was not ok');
+const csvText = await response.text();
+Papa.parse(csvText, {
+header: true,
+skipEmptyLines: true,
+fastMode: true, 
+complete: (results) => {
+state.allData = results.data
+.filter(row => row && Object.values(row).some(val => val != null && val !== ''))
+.map(row => {
+const newRow = {};
+for (const key in row) {
+if (Object.prototype.hasOwnProperty.call(row, key)) {
+newRow[String(key).trim()] = typeof row[key] === 'string' ? String(row[key]).trim() : row[key];
+}
+}
+return newRow;
+});
+initializeApp();
+}
+});
+} catch (error) {
+DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-exclamation-circle"></i> Error loading data. Please check connection and refresh.</div>`;
+console.error(error);
+}
+};
+
 const switchViewMode = (mode) => {
 if (state.viewMode === mode) return;
 if (state.viewMode === 'compare') {
@@ -982,94 +1018,166 @@ if (parsedState.filtersA && parsedState.filtersB) {
 state.compareFiltersA = { ...parsedState.filtersA };
 state.compareFiltersB = { ...parsedState.filtersB };
 } else {
-state.compareFiltersA = { ...defaultCompareFilters };
-state.compareFiltersB = { ...defaultCompareFilters };
-if (state.allYears.length > 0) {
-state.compareFiltersA.Year = state.allYears[0];
-}
-if (state.allYears.length > 1) {
-state.compareFiltersB.Year = state.allYears[1];
-} else if (state.allYears.length > 0) {
-state.compareFiltersB.Year = state.allYears[0];
-}
+resetCompareFilters();
 }
 } catch (e) {
 console.error('Error loading saved comparison state:', e);
-state.compareFiltersA = { ...defaultCompareFilters };
-state.compareFiltersB = { ...defaultCompareFilters };
-if (state.allYears.length > 0) {
-state.compareFiltersA.Year = state.allYears[0];
-}
-if (state.allYears.length > 1) {
-state.compareFiltersB.Year = state.allYears[1];
-} else if (state.allYears.length > 0) {
-state.compareFiltersB.Year = state.allYears[0];
-}
+resetCompareFilters();
 }
 } else {
-state.compareFiltersA = { ...defaultCompareFilters };
-state.compareFiltersB = { ...defaultCompareFilters };
-if (state.allYears.length > 0) {
-state.compareFiltersA.Year = state.allYears[0];
-}
-if (state.allYears.length > 1) {
-state.compareFiltersB.Year = state.allYears[1];
-} else if (state.allYears.length > 0) {
-state.compareFiltersB.Year = state.allYears[0];
-}
+resetCompareFilters();
 }
 }
 renderLayout();
 };
+
+const resetCompareFilters = () => {
+state.compareFiltersA = { ...defaultCompareFilters };
+state.compareFiltersB = { ...defaultCompareFilters };
+if (state.allYears.length > 0) {
+state.compareFiltersA.Year = state.allYears[0];
+}
+if (state.allYears.length > 1) {
+state.compareFiltersB.Year = state.allYears[1];
+} else if (state.allYears.length > 0) {
+state.compareFiltersB.Year = state.allYears[0];
+}
+};
+
 const openYearPopup = () => { renderYearList(); DOM.yearPopup.overlay.classList.add('visible'); };
 const closeYearPopup = () => DOM.yearPopup.overlay.classList.remove('visible');
+
 const renderYearList = (searchTerm = '') => {
 const sortedYears = [...state.allYears].sort((a, b) => state.yearSortOrder === 'desc' ? b - a : a - b);
 const filteredYears = sortedYears.filter(year => `${year - 1}-${year}`.includes(searchTerm));
-DOM.yearPopup.list.innerHTML = filteredYears.map(year => `<label class="popup-list-item" for="year-check-${year}"><input type="checkbox" id="year-check-${year}" value="${year}" ${state.analysisScopeYears.includes(year) ? 'checked' : ''}><span>${year - 1}-${year}</span></label>`).join('');
+    
+const fragment = document.createDocumentFragment();
+filteredYears.forEach(year => {
+const label = document.createElement('label');
+label.className = 'popup-list-item';
+label.setAttribute('for', `year-check-${year}`);
+    
+const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.id = `year-check-${year}`;
+checkbox.value = year;
+checkbox.checked = state.analysisScopeYears.includes(year);
+    
+const span = document.createElement('span');
+span.textContent = `${year - 1}-${year}`;
+    
+label.appendChild(checkbox);
+label.appendChild(span);
+fragment.appendChild(label);
+});
+    
+DOM.yearPopup.list.innerHTML = '';
+DOM.yearPopup.list.appendChild(fragment);
 };
-const updateAnalysisScopeYearsFromPopup = () => { state.analysisScopeYears = Array.from(DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value); };
-const toggleYearSort = () => { state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc'; renderYearList(DOM.yearPopup.searchInput.value); };
-const toggleAllYearsSelection = (select) => { DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = select); };
-const handleYearTagRemove = (e) => { const button = e.target.closest('.remove-tag-btn'); if (button) { const yearToRemove = button.dataset.year; state.analysisScopeYears = state.analysisScopeYears.filter(y => y !== yearToRemove); renderLayout(); } };
-const renderAnalysisScopeTags = () => { DOM.selectedYearsContainer.innerHTML = state.analysisScopeYears.sort((a,b) => b-a).map(year => `<span class="year-tag">${year - 1}-${year}<button class="remove-tag-btn" data-year="${year}" title="Remove year"><i class="fas fa-times"></i></button></span>`).join(''); };
+
+const updateAnalysisScopeYearsFromPopup = () => { 
+state.analysisScopeYears = Array.from(DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value); 
+};
+
+const toggleYearSort = () => { 
+state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc'; 
+renderYearList(DOM.yearPopup.searchInput.value); 
+};
+
+const toggleAllYearsSelection = (select) => { 
+DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = select); 
+};
+
+const handleYearTagRemove = (e) => { 
+const button = e.target.closest('.remove-tag-btn'); 
+if (button) { 
+const yearToRemove = button.dataset.year; 
+state.analysisScopeYears = state.analysisScopeYears.filter(y => y !== yearToRemove); 
+renderLayout(); 
+} 
+};
+
+const renderAnalysisScopeTags = () => {
+const fragment = document.createDocumentFragment();
+state.analysisScopeYears.sort((a,b) => b-a).forEach(year => {
+const tag = document.createElement('span');
+tag.className = 'year-tag';
+tag.innerHTML = `${year - 1}-${year}<button class="remove-tag-btn" data-year="${year}" title="Remove year"><i class="fas fa-times"></i></button>`;
+fragment.appendChild(tag);
+});
+DOM.selectedYearsContainer.innerHTML = '';
+DOM.selectedYearsContainer.appendChild(fragment);
+};
+
 const getFilteredData = (filters) => {
-return state.allData.filter(row =>
+const cacheKey = JSON.stringify(filters);
+if (dataCache.filteredData.has(cacheKey)) {
+return dataCache.filteredData.get(cacheKey);
+}
+    
+const filtered = state.allData.filter(row =>
 (filters.Year === 'all' || !filters.Year || row.Year === filters.Year) &&
 (filters.Region === 'all' || row.Region === filters.Region) &&
 (filters.Pharmacy === 'all' || row.Pharmacy === filters.Pharmacy) &&
 (filters.Month === 'all' || row.Month === filters.Month) &&
 (filters.Class === 'all' || row.Class === filters.Class)
 );
+    
+dataCache.filteredData.set(cacheKey, filtered);
+return filtered;
 };
+
 const getAvailableOptions = (filterKey, filters) => {
+const cacheKey = `${filterKey}-${JSON.stringify(filters)}`;
+if (dataCache.availableOptions.has(cacheKey)) {
+return dataCache.availableOptions.get(cacheKey);
+}
+    
 const filteredData = getFilteredData(filters);
 const uniqueValues = new Set(filteredData.map(row => row[filterKey]).filter(val => val != null && String(val).trim() !== ''));
-return Array.from(uniqueValues).sort((a,b) => {
+const options = Array.from(uniqueValues).sort((a,b) => {
 if (filterKey === 'Month') return getMonthOrderValue(a) - getMonthOrderValue(b);
 if (filterKey === 'Year') return b - a;
 return String(a).localeCompare(String(b), undefined, {numeric: true});
 });
+    
+dataCache.availableOptions.set(cacheKey, options);
+return options;
 };
+
 const updateAllFilters = (side) => {
 const filterState = state.viewMode === 'single'
 ? state.singleViewFilters
 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
 const filterSet = DOM.filtersArea.querySelector(`.filter-set.side-${side.toLowerCase()}`);
 if (!filterSet) return;
+    
 const filterKeys = ['Region', 'Pharmacy', 'Month', 'Class'];
 if (state.viewMode === 'compare') { filterKeys.unshift('Year'); }
+    
 filterKeys.forEach(filterKey => {
 const select = filterSet.querySelector(`#${filterKey}Filter-${side}`);
 if (!select) return;
+    
 const currentValue = select.value;
 const options = getAvailableOptions(filterKey, filterState);
-select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
+    
+const fragment = document.createDocumentFragment();
+const defaultOption = document.createElement('option');
+defaultOption.value = 'all';
+defaultOption.textContent = `All ${filterKey}s`;
+fragment.appendChild(defaultOption);
+    
 options.forEach(opt => {
-const displayText = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
-const option = new Option(displayText, opt);
-select.add(option);
+const option = document.createElement('option');
+option.value = opt;
+option.textContent = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
+fragment.appendChild(option);
 });
+    
+select.innerHTML = '';
+select.appendChild(fragment);
+    
 if (options.includes(currentValue)) {
 select.value = currentValue;
 } else {
@@ -1078,6 +1186,7 @@ filterState[filterKey] = 'all';
 }
 });
 };
+
 const handleFilterChange = (e) => {
 if (e.target.tagName === 'SELECT') {
 const side = e.target.dataset.side;
@@ -1086,12 +1195,18 @@ const filterState = state.viewMode === 'single'
 ? state.singleViewFilters
 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
 filterState[filterKey] = e.target.value;
+    
 if (filterKey === 'Region') {
 filterState.Pharmacy = 'all';
 filterState.Month = 'all';
 } else if (filterKey === 'Pharmacy') {
 filterState.Month = 'all';
 }
+    
+dataCache.filteredData.clear();
+dataCache.availableOptions.clear();
+dataCache.metrics.clear();
+    
 updateAllFilters(side);
 if (state.viewMode === 'compare') {
 updateFilterSetTitle(side);
@@ -1100,6 +1215,7 @@ saveComparisonState();
 updateAndRender();
 }
 };
+
 const handleFilterReset = (e) => {
 if (e.target.closest('.reset-filter-btn')) {
 const btn = e.target.closest('.reset-filter-btn');
@@ -1109,10 +1225,12 @@ const filterState = state.viewMode === 'single'
 ? state.singleViewFilters
 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
 filterState[filterKey] = 'all';
+    
 const select = document.getElementById(`${filterKey}Filter-${side}`);
 if (select) {
 select.value = 'all';
 }
+    
 if (filterKey === 'Region') {
 filterState.Pharmacy = 'all';
 filterState.Month = 'all';
@@ -1125,6 +1243,11 @@ filterState.Month = 'all';
 const monthSelect = document.getElementById(`MonthFilter-${side}`);
 if (monthSelect) monthSelect.value = 'all';
 }
+    
+dataCache.filteredData.clear();
+dataCache.availableOptions.clear();
+dataCache.metrics.clear();
+    
 updateAllFilters(side);
 if (state.viewMode === 'compare') {
 updateFilterSetTitle(side);
@@ -1133,11 +1256,13 @@ saveComparisonState();
 updateAndRender();
 }
 };
+
 const renderLayout = () => {
 DOM.mainControlsPanel.style.display = state.viewMode === 'single' ? 'flex' : 'none';
 DOM.filtersArea.innerHTML = '';
 DOM.resultsContainer.innerHTML = '';
 DOM.filtersArea.className = `filters-area ${state.viewMode}-view`;
+    
 if (state.viewMode === 'single') {
 DOM.filtersArea.appendChild(createFilterSet('A', 'Filters'));
 } else {
@@ -1151,8 +1276,10 @@ DOM.filtersArea.appendChild(filterSetA);
 DOM.filtersArea.appendChild(divider);
 DOM.filtersArea.appendChild(filterSetB);
 }
+    
 updateAndRender();
 };
+
 const generateFilterSetTitle = (filters, side) => {
 const titleParts = [];
 let yearText = 'All Years';
@@ -1161,6 +1288,7 @@ titleParts.push(`<span class="title-year side-${side.toLowerCase()}">${yearText}
 ['Region', 'Pharmacy', 'Month', 'Class'].forEach(key => { if (filters[key] !== 'all') titleParts.push(`<span>${filters[key]}</span>`); });
 return titleParts.join('<span class="separator">·</span>');
 };
+
 const updateFilterSetTitle = (side) => {
 const titleEl = document.getElementById(`filterSetTitle-${side}`);
 if(titleEl) {
@@ -1168,14 +1296,17 @@ const filters = side === 'A' ? state.compareFiltersA : state.compareFiltersB;
 titleEl.innerHTML = generateFilterSetTitle(filters, side);
 }
 };
+
 const createFilterSet = (side, title = '') => {
 const filterSet = document.createElement('div');
 filterSet.className = `filter-set side-${side.toLowerCase()}`;
 let filtersToShow = ['Region', 'Pharmacy', 'Month', 'Class'];
 if (state.viewMode === 'compare') { filtersToShow.unshift('Year'); }
+    
 const titleHTML = state.viewMode === 'compare'
 ? `<h3 id="filterSetTitle-${side}" class="filter-set-title"></h3>`
 : `<h3 class="filter-set-title">${title}</h3>`;
+    
 filterSet.innerHTML = `${titleHTML}<div class="filter-grid">${filtersToShow.map(filter =>
 `<div class="filter-group">
 <label for="${filter}Filter-${side}">${filter}</label>
@@ -1184,43 +1315,103 @@ filterSet.innerHTML = `${titleHTML}<div class="filter-grid">${filtersToShow.map(
 </button>
 <select id="${filter}Filter-${side}" data-side="${side}" data-filter="${filter}"></select>
 </div>`).join('')}</div>`;
+    
 filtersToShow.forEach(filterKey => populateSingleFilter(side, filterKey, filterSet));
 if (state.viewMode === 'compare') updateFilterSetTitle(side);
+    
 return filterSet;
 };
+
 const populateSingleFilter = (side, filterKey, container) => {
 const select = container.querySelector(`#${filterKey}Filter-${side}`);
 if(!select) return;
+    
 const filterState = state.viewMode === 'single'
 ? state.singleViewFilters
 : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
 const options = getAvailableOptions(filterKey, filterState);
-select.innerHTML = `<option value="all">All ${filterKey}s</option>`;
+    
+const fragment = document.createDocumentFragment();
+const defaultOption = document.createElement('option');
+defaultOption.value = 'all';
+defaultOption.textContent = `All ${filterKey}s`;
+fragment.appendChild(defaultOption);
+    
 options.forEach(opt => {
-const displayText = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
-select.add(new Option(displayText, opt))
+const option = document.createElement('option');
+option.value = opt;
+option.textContent = filterKey === 'Year' ? `${opt - 1}-${opt}` : opt;
+fragment.appendChild(option);
 });
+    
+select.innerHTML = '';
+select.appendChild(fragment);
 select.value = filterState[filterKey] || 'all';
 };
-const calculateMetrics = (data) => {
-const metrics = { 'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0, 'Active Pharmacies': new Set(data.map(r => r.Pharmacy)).size };
+
+const calculateMetrics = (data, filters) => {
+const cacheKey = `metrics-${JSON.stringify(filters)}`;
+if (dataCache.metrics.has(cacheKey)) {
+return dataCache.metrics.get(cacheKey);
+}
+    
+const activePharmaciesCount = new Set(data.map(r => r.Pharmacy)).size;
+let inactiveCount;
+const baseScopeFilters = { Year: filters.Year };
+if (filters.Region !== 'all') baseScopeFilters.Region = filters.Region;
+if (filters.Class !== 'all') baseScopeFilters.Class = filters.Class;
+    
+const potentialPharmaciesData = state.allData.filter(row =>
+Object.keys(baseScopeFilters).every(key => row[key] === baseScopeFilters[key])
+);
+const potentialPharmaciesList = [...new Set(potentialPharmaciesData.map(r => r.Pharmacy))];
+    
+const pharmaciesInScope = filters.Pharmacy === 'all'
+? potentialPharmaciesList
+: (potentialPharmaciesList.includes(filters.Pharmacy) ? [filters.Pharmacy] : []);
+const monthsInScopeCount = filters.Month === 'all' ? 12 : 1;
+    
+const totalPossibleEntries = pharmaciesInScope.length * monthsInScopeCount;
+const actualEntries = new Set(data.map(row => `${row.Pharmacy}-${row.Month}`)).size;
+inactiveCount = totalPossibleEntries - actualEntries;
+if (inactiveCount < 0) inactiveCount = 0;
+    
+const metrics = {
+'Total Value': 0,
+'Total Prescriptions': 0,
+'Insurance Covered': 0,
+'Active Pharmacies': activePharmaciesCount,
+'Inactive Count': inactiveCount,
+};
+    
 METRICS_CONFIG.forEach(cat => metrics[cat] = 0);
+    
 data.forEach(row => {
 metrics['Total Prescriptions'] += parseFloat(row['Total Prescription'] || 0) || 0;
 metrics['Insurance Covered'] += parseFloat(row['Insurance Covered Prescription'] || 0) || 0;
-METRICS_CONFIG.forEach(cat => { const val = parseFloat(row[cat] || 0) || 0; metrics[cat] += val; metrics['Total Value'] += val; });
+METRICS_CONFIG.forEach(cat => { 
+const val = parseFloat(row[cat] || 0) || 0; 
+metrics[cat] += val; 
+metrics['Total Value'] += val; 
 });
+});
+    
+dataCache.metrics.set(cacheKey, metrics);
 return metrics;
 };
+
 const updateAndRender = () => {
 if (state.viewMode === 'single') {
 DOM.resultsContainer.className = 'results-container';
 renderAnalysisScopeTags();
-if(state.analysisScopeYears.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> Please select at least one year in the Analysis Scope.</div>`; return; }
+if(state.analysisScopeYears.length === 0) { 
+DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> Please select at least one year in the Analysis Scope.</div>`; 
+return; 
+}
 const yearlyMetricsData = {};
 state.analysisScopeYears.forEach(year => {
 const yearFilters = {...state.singleViewFilters, Year: year};
-yearlyMetricsData[year] = calculateMetrics(getFilteredData(yearFilters));
+yearlyMetricsData[year] = calculateMetrics(getFilteredData(yearFilters), yearFilters);
 });
 renderSingleTable(yearlyMetricsData);
 } else {
@@ -1228,72 +1419,181 @@ DOM.resultsContainer.className = '';
 renderCompareTable();
 }
 };
-const formatNumber = (num) => isNaN(num) ? 'N/A' : num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
 const renderSingleTable = (yearlyMetricsData) => {
 const years = Object.keys(yearlyMetricsData).sort((a,b) => b-a);
-if(years.length === 0) { DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> No data for selected filters.</div>`; return; }
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
-let tableHTML = `<table class="results-table"><thead><tr><th class="metric-header">Metric</th>`;
-years.forEach(year => tableHTML += `<th class="numeric-header">${year-1}-${year}</th>`);
-tableHTML += `</tr></thead><tbody>`;
-allMetrics.forEach(metric => {
-tableHTML += `<tr><td class="metric-name">${metric}</td>`;
-years.forEach(year => tableHTML += `<td class="numeric">${formatNumber(yearlyMetricsData[year][metric])}</td>`);
-tableHTML += `</tr>`;
+if(years.length === 0) { 
+DOM.resultsContainer.innerHTML = `<div class="no-data-message"><i class="fas fa-info-circle"></i> No data for selected filters.</div>`; 
+return; 
+}
+    
+const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', 'Inactive Count', ...METRICS_CONFIG];
+    
+const fragment = document.createDocumentFragment();
+const table = document.createElement('table');
+table.className = 'results-table';
+    
+const thead = document.createElement('thead');
+const headerRow = document.createElement('tr');
+    
+const metricHeader = document.createElement('th');
+metricHeader.className = 'metric-header';
+metricHeader.textContent = 'Metric';
+headerRow.appendChild(metricHeader);
+    
+years.forEach(year => {
+const yearHeader = document.createElement('th');
+yearHeader.className = 'numeric-header';
+yearHeader.textContent = `${year-1}-${year}`;
+headerRow.appendChild(yearHeader);
 });
-DOM.resultsContainer.innerHTML = tableHTML + '</tbody></table>';
+    
+thead.appendChild(headerRow);
+table.appendChild(thead);
+    
+const tbody = document.createElement('tbody');
+    
+allMetrics.forEach(metric => {
+const row = document.createElement('tr');
+    
+const metricCell = document.createElement('td');
+metricCell.className = 'metric-name';
+metricCell.textContent = metric;
+row.appendChild(metricCell);
+    
+years.forEach(year => {
+const valueCell = document.createElement('td');
+valueCell.className = 'numeric';
+valueCell.textContent = formatNumber(yearlyMetricsData[year][metric]);
+row.appendChild(valueCell);
+});
+    
+tbody.appendChild(row);
+});
+    
+table.appendChild(tbody);
+fragment.appendChild(table);
+DOM.resultsContainer.innerHTML = '';
+DOM.resultsContainer.appendChild(fragment);
 };
+
 const renderCompareTable = () => {
-const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA));
-const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB));
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
-let tableHTML = `<div class="compare-tables-container">`;
+const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA), state.compareFiltersA);
+const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB), state.compareFiltersB);
+const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', 'Inactive Count', ...METRICS_CONFIG];
+    
+const fragment = document.createDocumentFragment();
+const container = document.createElement('div');
+container.className = 'compare-tables-container';
+    
 const createTable = (side, metrics, compareMetrics = null) => {
 const filters = side === 'A' ? state.compareFiltersA : state.compareFiltersB;
-let html = `<div class="compare-table side-${side.toLowerCase()}">`;
-html += `<div class="compare-table-header">${generateFilterSetTitle(filters, side).replace(/<[^>]*>/g, ' ').replace(/·/g, ' - ')}</div>`;
-html += `<div class="compare-table-content"><div class="compare-table-scroll">`;
-html += `<table class="results-table"><thead><tr><th class="metric-header">Metric</th><th class="numeric-header col-side-${side.toLowerCase()}">Value</th></tr></thead><tbody>`;
+const tableDiv = document.createElement('div');
+tableDiv.className = `compare-table side-${side.toLowerCase()}`;
+    
+const headerDiv = document.createElement('div');
+headerDiv.className = 'compare-table-header';
+headerDiv.textContent = generateFilterSetTitle(filters, side).replace(/<[^>]*>/g, ' ').replace(/·/g, ' - ').trim();
+tableDiv.appendChild(headerDiv);
+    
+const contentDiv = document.createElement('div');
+contentDiv.className = 'compare-table-content';
+    
+const scrollDiv = document.createElement('div');
+scrollDiv.className = 'compare-table-scroll';
+    
+const table = document.createElement('table');
+table.className = 'results-table';
+    
+const thead = document.createElement('thead');
+const headerRow = document.createElement('tr');
+    
+const metricHeader = document.createElement('th');
+metricHeader.className = 'metric-header';
+metricHeader.textContent = 'Metric';
+headerRow.appendChild(metricHeader);
+    
+const valueHeader = document.createElement('th');
+valueHeader.className = `numeric-header col-side-${side.toLowerCase()}`;
+valueHeader.textContent = 'Value';
+headerRow.appendChild(valueHeader);
+    
+thead.appendChild(headerRow);
+table.appendChild(thead);
+    
+const tbody = document.createElement('tbody');
+    
 allMetrics.forEach(metric => {
-let comparisonContent = '';
+const row = document.createElement('tr');
+    
+const metricCell = document.createElement('td');
+metricCell.className = 'metric-name';
+metricCell.textContent = metric;
+row.appendChild(metricCell);
+    
+const valueCell = document.createElement('td');
+valueCell.className = 'numeric';
+    
+const valueContent = document.createElement('div');
+valueContent.className = 'numeric-cell-content';
+    
+const valueSpan = document.createElement('span');
+valueSpan.textContent = formatNumber(metrics[metric]);
+valueContent.appendChild(valueSpan);
+    
 if (compareMetrics) {
 const currentVal = metrics[metric];
 const otherVal = compareMetrics[metric];
 const diff = currentVal - otherVal;
 const diffClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : '');
+    
 if (diff !== 0) {
 const perc = otherVal !== 0 ? (diff / Math.abs(otherVal)) * 100 : (currentVal > 0 ? Infinity : 0);
 const arrow = diff > 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
 const percText = isFinite(perc) ? `${diff > 0 ? '+' : ''}${perc.toFixed(1)}%` : '∞';
-comparisonContent = `<span class="comparison-cell ${diffClass}">${arrow} ${percText}</span>`;
+    
+const comparisonCell = document.createElement('span');
+comparisonCell.className = `comparison-cell ${diffClass}`;
+comparisonCell.innerHTML = `${arrow} ${percText}`;
+valueContent.appendChild(comparisonCell);
 } else {
-comparisonContent = `<span class="comparison-cell">–</span>`;
+const comparisonCell = document.createElement('span');
+comparisonCell.className = 'comparison-cell';
+comparisonCell.textContent = '–';
+valueContent.appendChild(comparisonCell);
 }
 } else {
-comparisonContent = `<span class="comparison-cell"></span>`;
+const comparisonCell = document.createElement('span');
+comparisonCell.className = 'comparison-cell';
+valueContent.appendChild(comparisonCell);
 }
-html += `<tr>
-<td class="metric-name">${metric}</td>
-<td class="numeric">
-<div class="numeric-cell-content">
-<span>${formatNumber(metrics[metric])}</span>
-${comparisonContent}
-</div>
-</td>
-</tr>`;
+    
+valueCell.appendChild(valueContent);
+row.appendChild(valueCell);
+tbody.appendChild(row);
 });
-html += `</tbody></table></div></div></div>`;
-return html;
+    
+table.appendChild(tbody);
+scrollDiv.appendChild(table);
+contentDiv.appendChild(scrollDiv);
+tableDiv.appendChild(contentDiv);
+    
+return tableDiv;
 };
-tableHTML += createTable('A', metricsA, metricsB);
-tableHTML += createTable('B', metricsB, metricsA);
-tableHTML += `</div>`;
-DOM.resultsContainer.innerHTML = tableHTML;
+    
+container.appendChild(createTable('A', metricsA, metricsB));
+container.appendChild(createTable('B', metricsB, metricsA));
+fragment.appendChild(container);
+DOM.resultsContainer.innerHTML = '';
+DOM.resultsContainer.appendChild(fragment);
+    
 setupSynchronizedScrolling();
 };
+
 const setupSynchronizedScrolling = () => {
 const scrollContainers = DOM.resultsContainer.querySelectorAll('.compare-table-scroll');
 if (scrollContainers.length !== 2) return;
+    
 let isScrolling = false;
 scrollContainers[0].addEventListener('scroll', () => {
 if (!isScrolling) {
@@ -1303,6 +1603,7 @@ scrollContainers[1].scrollLeft = scrollContainers[0].scrollLeft;
 setTimeout(() => { isScrolling = false; }, 50);
 }
 });
+    
 scrollContainers[1].addEventListener('scroll', () => {
 if (!isScrolling) {
 isScrolling = true;
@@ -1312,6 +1613,7 @@ setTimeout(() => { isScrolling = false; }, 50);
 }
 });
 };
+
 const saveComparisonState = () => {
 if (state.viewMode === 'compare') {
 const stateToSave = {
@@ -1321,6 +1623,7 @@ filtersB: state.compareFiltersB
 localStorage.setItem('analyticsDashboardComparisonState', JSON.stringify(stateToSave));
 }
 };
+
 const loadSavedComparisonState = () => {
 const savedState = localStorage.getItem('analyticsDashboardComparisonState');
 if (savedState) {
@@ -1337,16 +1640,23 @@ console.error('Error loading saved comparison state:', e);
 }
 }
 };
+
 const showRestoreNotification = () => {
 DOM.restoreNotification.container.classList.add('visible');
 setTimeout(() => {
 DOM.restoreNotification.container.classList.remove('visible');
 }, 10000);
 };
+
 const restoreComparisonState = () => {
 if (state.savedComparisonState) {
 state.compareFiltersA = { ...state.savedComparisonState.filtersA };
 state.compareFiltersB = { ...state.savedComparisonState.filtersB };
+    
+dataCache.filteredData.clear();
+dataCache.availableOptions.clear();
+dataCache.metrics.clear();
+    
 updateAllFilters('A');
 updateAllFilters('B');
 updateFilterSetTitle('A');
@@ -1355,37 +1665,58 @@ updateAndRender();
 }
 DOM.restoreNotification.container.classList.remove('visible');
 };
+
 const dismissRestoreNotification = () => {
 DOM.restoreNotification.container.classList.remove('visible');
 };
+
 const exportData = () => {
 let dataToExport = [];
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', ...METRICS_CONFIG];
+const allMetrics = ['Total Value', 'Total Prescriptions', 'Insurance Covered', 'Active Pharmacies', 'Inactive Count', ...METRICS_CONFIG];
 let filename;
+    
 if (state.viewMode === 'single') {
 const yearlyMetricsData = {};
 state.analysisScopeYears.forEach(year => {
 const yearFilters = {...state.singleViewFilters, Year: year};
-yearlyMetricsData[year] = calculateMetrics(getFilteredData(yearFilters));
+yearlyMetricsData[year] = calculateMetrics(getFilteredData(yearFilters), yearFilters);
 });
+    
 const years = Object.keys(yearlyMetricsData).sort((a,b) => b-a);
-dataToExport = allMetrics.map(metric => { const row = { Metric: metric }; years.forEach(year => { row[`${year-1}-${year}`] = yearlyMetricsData[year][metric]; }); return row; });
+dataToExport = allMetrics.map(metric => { 
+const row = { Metric: metric }; 
+years.forEach(year => { 
+row[`${year-1}-${year}`] = yearlyMetricsData[year][metric]; 
+}); 
+return row; 
+});
 filename = `analytics_single-view_${new Date().toISOString().slice(0,10)}.csv`;
 } else {
-const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA));
-const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB));
+const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA), state.compareFiltersA);
+const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB), state.compareFiltersB);
 const titleA = generateFilterSetTitle(state.compareFiltersA, 'A').replace(/<[^>]*>/g, ' ').replace(/·/g, '-').trim();
 const titleB = generateFilterSetTitle(state.compareFiltersB, 'B').replace(/<[^>]*>/g, ' ').replace(/·/g, '-').trim();
+    
 dataToExport = allMetrics.map(metric => {
 const [valA, valB] = [metricsA[metric], metricsB[metric]];
 const perc = valA !== 0 ? ((valB - valA) / Math.abs(valA)) * 100 : (valB > 0 ? Infinity : 0);
-return { Metric: metric, [titleA]: valA, [titleB]: valB, 'Comparison (%)': isFinite(perc) ? perc.toFixed(1) : 'N/A' };
+return { 
+Metric: metric, 
+[titleA]: valA, 
+[titleB]: valB, 
+'Comparison (%)': isFinite(perc) ? perc.toFixed(1) : 'N/A' 
+};
 });
 filename = `analytics_comparison_${new Date().toISOString().slice(0,10)}.csv`;
 }
-if (dataToExport.length === 0) { alert("No data to export."); return; }
+    
+if (dataToExport.length === 0) { 
+alert("No data to export."); 
+return; 
+}
 generateCSV(dataToExport, filename);
 };
+
 const generateCSV = (data, filename) => {
 const csv = Papa.unparse(data);
 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -1397,6 +1728,7 @@ document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
 };
+
 fetchData();
 });
 </script>
