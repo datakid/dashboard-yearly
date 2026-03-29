@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -36,7 +35,6 @@
 --radius-xl: 24px;
 --transition: all 0.2s ease;
 }
-
 
 ::-webkit-scrollbar {
 width: 6px;
@@ -623,7 +621,6 @@ border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 .compare-table-content { height: auto; max-height: 400px; }
 }
 </style>
-
 </head>
 <body>
 
@@ -675,6 +672,8 @@ border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 </div>
 
 <script>
+const escapeHTML = (str) => String(str).replace(/[&<>'"]/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match]));
+
 document.addEventListener('DOMContentLoaded', () => {
 const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -844,8 +843,8 @@ years = years.filter(y => y.includes(searchTerm) || `${y-1}-${y}`.includes(searc
 
 DOM.yearPopup.list.innerHTML = years.map(y => `
 <label class="popup-list-item">
-<input type="checkbox" value="${y}" ${state.analysisScopeYears.includes(String(y)) ? 'checked' : ''}>
-<span>${y-1}-${y}</span>
+<input type="checkbox" value="${escapeHTML(y)}" ${state.analysisScopeYears.includes(String(y)) ? 'checked' : ''}>
+<span>${escapeHTML(y-1)}-${escapeHTML(y)}</span>
 </label>
 `).join('');
 };
@@ -918,13 +917,13 @@ const filters = ['Region', 'Pharmacy', 'Month', 'Class'];
 if(state.viewMode === 'compare') filters.unshift('Year');
 
 el.innerHTML = `
-<div class="filter-set-title"><i class="fas ${side === 'A' ? 'fa-filter' : 'fa-sliders-h'}" style="color: var(--accent-${side === 'A' ? 'primary' : 'secondary'});"></i> <span style="font-weight:700;">${title}</span></div>
+<div class="filter-set-title"><i class="fas ${side === 'A' ? 'fa-filter' : 'fa-sliders-h'}" style="color: var(--accent-${side === 'A' ? 'primary' : 'secondary'});"></i> <span style="font-weight:700;">${escapeHTML(title)}</span></div>
 <div class="filter-grid">
 ${filters.map(f => `
 <div class="filter-group">
-<label>${f}</label>
-<select data-side="${side}" data-filter="${f}" id="${f}-${side}"></select>
-<button class="reset-filter-btn" data-side="${side}" data-filter="${f}"><i class="fas fa-undo-alt" style="font-size: 0.8rem;"></i></button>
+<label>${escapeHTML(f)}</label>
+<select data-side="${side}" data-filter="${escapeHTML(f)}" id="${escapeHTML(f)}-${side}"></select>
+<button class="reset-filter-btn" data-side="${side}" data-filter="${escapeHTML(f)}"><i class="fas fa-undo-alt" style="font-size: 0.8rem;"></i></button>
 </div>
 `).join('')}
 </div>
@@ -949,7 +948,7 @@ else if(key === 'Month') options.sort((a,b) => (MONTH_ORDER[a.toLowerCase()]||99
 else options.sort();
 
 const currentVal = filters[key];
-select.innerHTML = `<option value="all">All ${key}s</option>` + options.map(o => `<option value="${o}">${key==='Year'? (o-1)+'-'+o : o}</option>`).join('');
+select.innerHTML = `<option value="all">All ${escapeHTML(key)}s</option>` + options.map(o => `<option value="${escapeHTML(o)}">${key==='Year'? escapeHTML(o-1)+'-'+escapeHTML(o) : escapeHTML(o)}</option>`).join('');
 select.value = options.includes(currentVal) ? currentVal : 'all';
 
 if(select.value !== currentVal) filters[key] = select.value;
@@ -979,7 +978,7 @@ let html = `
 <thead>
 <tr>
 <th class="metric-header" style="min-width:250px;">Metric</th>
-${years.map(y => `<th class="numeric-header" style="text-align: right;">${y-1}-${y}</th>`).join('')}
+${years.map(y => `<th class="numeric-header" style="text-align: right;">${escapeHTML(y-1)}-${escapeHTML(y)}</th>`).join('')}
 </tr>
 </thead>
 <tbody>`;
@@ -991,7 +990,7 @@ const min = Math.min(...values);
 const isVaried = max !== min && max > 0;
 
 html += `<tr>
-<td class="metric-name">${metric}</td>
+<td class="metric-name">${escapeHTML(metric)}</td>
 ${years.map((y, idx) => {
 const val = metricsMap[y][metric];
 let classExtra = '';
@@ -1014,7 +1013,7 @@ const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', .
 const renderSide = (metrics, comparisonMetrics, sideName, sideClass) => {
 let html = `
 <div class="compare-table ${sideClass}">
-<div class="compare-table-header">${sideName}</div>
+<div class="compare-table-header">${escapeHTML(sideName)}</div>
 <div class="compare-table-content">
 <table class="results-table compare-view-table">
 <thead>
@@ -1036,7 +1035,7 @@ pill = `<span class="comparison-pill ${isPos?'positive':'negative'}">${isPos?'+'
 }
 
 html += `<tr>
-<td class="metric-name">${m}</td>
+<td class="metric-name">${escapeHTML(m)}</td>
 <td class="numeric">
 <div class="numeric-cell-content">
 ${pill} <span>${formatNumber(val)}</span>
@@ -1071,12 +1070,16 @@ if(!isSyncing) { isSyncing=true; panes[0].scrollTop = this.scrollTop; setTimeout
 
 const renderSelectedYearTags = () => {
 const container = document.getElementById('selectedYearsContainer');
-container.innerHTML = state.analysisScopeYears.map(y => `
+container.innerHTML = state.analysisScopeYears.map(y => {
+const safeY = escapeHTML(y);
+const safeJSY = escapeHTML(String(y).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+return `
 <span class="year-tag">
-<i class="fas fa-check-circle" style="color: var(--accent-primary);"></i> ${y-1}-${y}
-<button class="remove-tag-btn" onclick="removeYear('${y}')"><i class="fas fa-times"></i></button>
+<i class="fas fa-check-circle" style="color: var(--accent-primary);"></i> ${escapeHTML(y-1)}-${safeY}
+<button class="remove-tag-btn" onclick="removeYear('${safeJSY}')"><i class="fas fa-times"></i></button>
 </span>
-`).join('');
+`;
+}).join('');
 };
 
 window.removeYear = (y) => {
