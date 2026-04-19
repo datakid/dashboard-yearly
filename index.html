@@ -39,25 +39,15 @@
 --transition-spring: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
 
-::-webkit-scrollbar {
-width: 6px;
-height: 6px;
-}
-::-webkit-scrollbar-track {
-background: transparent;
-}
-::-webkit-scrollbar-thumb {
-background: rgba(148, 163, 184, 0.3);
-border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-background: rgba(148, 163, 184, 0.6);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
 
-*, *::before, *::after { 
-box-sizing: border-box; 
-margin: 0; 
-padding: 0; 
+*, *::before, *::after {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
 }
@@ -144,9 +134,7 @@ font-family: inherit;
 letter-spacing: -0.01em;
 }
 
-.toggle-switch button.active {
-color: white;
-}
+.toggle-switch button.active { color: white; }
 
 .toggle-indicator {
 position: absolute;
@@ -200,11 +188,10 @@ gap: 1rem;
 
 .scope-title {
 font-weight: 700;
-color: var(--text-primary);
+color: var(--text-tertiary);
 letter-spacing: -0.01em;
 text-transform: uppercase;
 font-size: 0.75rem;
-color: var(--text-tertiary);
 }
 
 .year-control-area {
@@ -240,10 +227,7 @@ border-color: var(--accent-primary);
 box-shadow: var(--shadow-md);
 }
 
-.year-tag i.fa-check-circle {
-color: var(--accent-primary);
-font-size: 0.9rem;
-}
+.year-tag i.fa-check-circle { color: var(--accent-primary); font-size: 0.9rem; }
 
 .remove-tag-btn {
 background: var(--bg-tertiary);
@@ -407,13 +391,6 @@ z-index: 2;
 
 .reset-filter-btn:hover { color: var(--accent-danger); }
 
-.filter-group select:not([value="all"]) ~ .reset-filter-btn {
-display: flex;
-}
-.filter-group select[value="all"] ~ .reset-filter-btn {
-display: none;
-}
-
 .results-container {
 overflow: hidden;
 box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,0.8);
@@ -458,27 +435,12 @@ cursor: pointer;
 .results-table tbody tr.row-dimmed { opacity: 0.35; filter: grayscale(0.8); }
 .results-table tbody tr:last-child td { border-bottom: none; }
 
-.metric-name {
-font-weight: 600;
-color: var(--text-primary);
-font-size: 0.9rem;
-}
+.metric-name { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+.numeric { text-align: right; font-weight: 500; color: var(--text-secondary); }
 
-.numeric {
-text-align: right;
-font-weight: 500;
-color: var(--text-secondary);
-}
+.single-view-scroll-wrapper { overflow-x: auto; width: 100%; }
 
-.single-view-scroll-wrapper {
-overflow-x: auto;
-width: 100%;
-}
-
-.results-table.single-view-table {
-table-layout: auto;
-min-width: 100%;
-}
+.results-table.single-view-table { table-layout: auto; min-width: 100%; }
 
 .results-table.single-view-table th:first-child,
 .results-table.single-view-table td:first-child {
@@ -506,7 +468,16 @@ background-color: rgba(248, 250, 252, 0.98);
 .cell-min { color: var(--accent-danger); font-weight: 600; background-color: rgba(239, 68, 68, 0.03); }
 
 .compare-tables-container { display: flex; gap: 1.5rem; padding: 1.5rem; }
-.compare-table { flex: 1; display: flex; flex-direction: column; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); background: var(--bg-secondary); }
+.compare-table {
+flex: 1;
+display: flex;
+flex-direction: column;
+border-radius: var(--radius-lg);
+overflow: hidden;
+box-shadow: var(--shadow-sm);
+border: 1px solid var(--border-primary);
+background: var(--bg-secondary);
+}
 
 .compare-table-header {
 font-weight: 700;
@@ -607,10 +578,7 @@ transition: var(--transition-fast);
 font-size: 1rem;
 }
 
-.popup-close-btn:hover {
-background: var(--text-secondary);
-color: white;
-}
+.popup-close-btn:hover { background: var(--text-secondary); color: white; }
 
 .popup-toolbar {
 padding: 1rem 1.5rem;
@@ -712,7 +680,6 @@ font-size: 0.95rem;
 .popup-footer {
 padding: 1.25rem 1.5rem;
 border-top: 1px solid var(--border-primary);
-text-align: right;
 background: var(--bg-secondary);
 border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 display: flex;
@@ -730,14 +697,8 @@ align-items: center;
 gap: 1rem;
 }
 
-.state-message i {
-font-size: 2.5rem;
-color: var(--text-tertiary);
-}
-
-.state-message.error i {
-color: var(--accent-danger);
-}
+.state-message i { font-size: 2.5rem; color: var(--text-tertiary); }
+.state-message.error i { color: var(--accent-danger); }
 
 .export-textarea {
 width: 100%;
@@ -781,578 +742,535 @@ body { padding: 1rem; }
 <body>
 
 <div class="container">
-<header class="header glass-panel">
-<h1>Dashboard Arena</h1>
-<div class="controls">
-<div class="toggle-switch">
-<button id="singleViewBtn" class="active">Single View</button>
-<button id="compareViewBtn">Compare</button>
-<div class="toggle-indicator"></div>
-</div>
-<button id="exportBtn" class="action-btn">
-<i class="fas fa-download"></i> Export CSV
-</button>
-</div>
-</header>
-<section class="main-controls-panel glass-panel" id="mainControlsPanel">
+  <header class="header glass-panel">
+    <h1>Dashboard Arena</h1>
+    <div class="controls">
+      <div class="toggle-switch">
+        <button id="singleViewBtn" class="active">Single View</button>
+        <button id="compareViewBtn">Compare</button>
+        <div class="toggle-indicator"></div>
+      </div>
+      <button id="exportBtn" class="action-btn">
+        <i class="fas fa-download"></i> Export CSV
+      </button>
+    </div>
+  </header>
+
+  <section class="main-controls-panel glass-panel" id="mainControlsPanel">
     <div class="scope-title">Single View Scope</div>
     <div class="year-control-area">
-        <button class="action-btn" id="selectYearsBtn">
-            <i class="fas fa-calendar-alt"></i> Select Years
-        </button>
-        <div id="selectedYearsContainer"></div>
+      <button class="action-btn" id="selectYearsBtn">
+        <i class="fas fa-calendar-alt"></i> Select Years
+      </button>
+      <div id="selectedYearsContainer"></div>
     </div>
-</section>
+  </section>
 
-<section id="filtersArea" class="filters-area"></section>
-<section id="resultsContainer" class="results-container glass-panel"></section>
+  <section id="filtersArea" class="filters-area"></section>
+  <section id="resultsContainer" class="results-container glass-panel"></section>
 </div>
 
 <div class="popup-overlay" id="yearSelectorPopup">
-<div class="popup-content">
-<div class="popup-header">
-<h2>Select Years</h2>
-<button class="popup-close-btn" id="closePopupBtn"><i class="fas fa-times"></i></button>
-</div>
-<div class="popup-toolbar">
-<input type="search" id="yearSearchInput" class="popup-search" placeholder="Filter years...">
-<button id="sortYearsBtn"><i class="fas fa-sort"></i> Sort</button>
-<button id="selectAllYearsBtn">All</button>
-<button id="deselectAllYearsBtn">None</button>
-</div>
-<div class="popup-list" id="yearList"></div>
-<div class="popup-footer">
-<button id="donePopupBtn" class="action-btn">Apply Selection</button>
-</div>
-</div>
+  <div class="popup-content">
+    <div class="popup-header">
+      <h2>Select Years</h2>
+      <button class="popup-close-btn" id="closePopupBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="popup-toolbar">
+      <input type="search" id="yearSearchInput" class="popup-search" placeholder="Filter years...">
+      <button id="sortYearsBtn"><i class="fas fa-sort"></i> Sort</button>
+      <button id="selectAllYearsBtn">All</button>
+      <button id="deselectAllYearsBtn">None</button>
+    </div>
+    <div class="popup-list" id="yearList"></div>
+    <div class="popup-footer">
+      <button id="donePopupBtn" class="action-btn">Apply Selection</button>
+    </div>
+  </div>
 </div>
 
 <div class="popup-overlay" id="exportModalPopup">
-<div class="popup-content" style="max-width: 600px;">
-<div class="popup-header">
-<h2><i class="fas fa-file-csv" style="color: var(--accent-success); margin-right: 8px;"></i> Export Generated</h2>
-<button class="popup-close-btn" id="closeExportPopupBtn"><i class="fas fa-times"></i></button>
-</div>
-<div style="padding: 1.5rem;">
-<div class="export-info">
-<strong>Download initiated.</strong><br>
-If your browser or preview environment blocked the automatic download, you can safely copy the raw CSV data below and paste it into a blank text file (save as .csv) or directly into Excel. All numbers are specially formatted to prevent Excel scientific notation.
-</div>
-<textarea id="exportTextarea" class="export-textarea" readonly></textarea>
-</div>
-<div class="popup-footer">
-<button id="copyCsvBtn" class="action-btn"><i class="fas fa-copy"></i> Copy to Clipboard</button>
-</div>
-</div>
+  <div class="popup-content" style="max-width: 600px;">
+    <div class="popup-header">
+      <h2><i class="fas fa-file-csv" style="color: var(--accent-success); margin-right: 8px;"></i> Export Generated</h2>
+      <button class="popup-close-btn" id="closeExportPopupBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="padding: 1.5rem;">
+      <div class="export-info">
+        <strong>Download initiated.</strong><br>
+        If your browser blocked the automatic download, copy the raw CSV data below and paste it into a text file saved as .csv, or directly into Excel.
+      </div>
+      <textarea id="exportTextarea" class="export-textarea" readonly></textarea>
+    </div>
+    <div class="popup-footer">
+      <button id="copyCsvBtn" class="action-btn"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const escapeHTML = (str) => String(str).replace(/[&<>'"]/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match]));
 
 document.addEventListener('DOMContentLoaded', () => {
-const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-const METRICS_CONFIG = [ 'المسكنات', 'مضادات حيوية', 'كلي', 'نفسية و عصبية', 'قلب', 'سكر حقن', 'سكر فم', 'نسا', 'كبد', 'جهاز هضمي', 'جهاز تنفسي', 'امراض جلدية', 'عيون و رمد', 'انف و اذن', 'مضادات تقلصات', 'اورام', 'فيتامينات', 'مختلفة' ];
-const MONTH_ORDER = { july: 1, august: 2, september: 3, october: 4, november: 5, december: 6, january: 7, february: 8, march: 9, april: 10, may: 11, june: 12, 'يوليو': 1, 'أغسطس': 2, 'سبتمبر': 3, 'أكتوبر': 4, 'نوفمبر': 5, 'ديسمبر': 6, 'يناير': 7, 'فبراير': 8, 'مارس': 9, 'أبريل': 10, 'مايو': 11, 'يونيو': 12 };
-
-const state = {
-allData: [],
-allYears: [],
-viewMode: 'single',
-analysisScopeYears: [],
-singleFilters: { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
-compareFiltersA: { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
-compareFiltersB: { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
-cachedMetrics: new Map(),
-yearSortOrder: 'desc'
-};
-
-const DOM = {
-singleViewBtn: document.getElementById('singleViewBtn'),
-compareViewBtn: document.getElementById('compareViewBtn'),
-filtersArea: document.getElementById('filtersArea'),
-resultsContainer: document.getElementById('resultsContainer'),
-mainControlsPanel: document.getElementById('mainControlsPanel'),
-yearPopup: {
-overlay: document.getElementById('yearSelectorPopup'),
-list: document.getElementById('yearList'),
-search: document.getElementById('yearSearchInput'),
-sortBtn: document.getElementById('sortYearsBtn'),
-selectAll: document.getElementById('selectAllYearsBtn'),
-deselectAll: document.getElementById('deselectAllYearsBtn'),
-doneBtn: document.getElementById('donePopupBtn'),
-closeBtn: document.getElementById('closePopupBtn')
-}
-};
-
-const debounce = (func, wait) => {
-let timeout;
-return function(...args) {
-clearTimeout(timeout);
-timeout = setTimeout(() => func.apply(this, args), wait);
-};
-};
-
-const formatNumber = (num) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0';
-
-const init = async () => {
-DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-circle-notch fa-spin" style="color: var(--accent-primary);"></i><span>Loading Data...</span></div>';
-try {
-const res = await fetch(SHEET_URL);
-const text = await res.text();
-Papa.parse(text, { header: true, skipEmptyLines: true, complete: (results) => {
-state.allData = results.data.filter(r => r && r.Year && r.Year.trim() !== '');
-state.allYears = [...new Set(state.allData.map(r => r.Year))].sort((a,b) => b-a);
-state.analysisScopeYears = state.allYears.slice(0, 3);
-
-if(state.allYears.length > 0) state.compareFiltersA.Year = state.allYears[0];
-if(state.allYears.length > 1) state.compareFiltersB.Year = state.allYears[1];
-
-renderLayout();
-setupEvents();
-}});
-} catch (e) {
-DOM.resultsContainer.innerHTML = '<div class="state-message error"><i class="fas fa-exclamation-triangle"></i><span>Error loading data. Refresh page.</span></div>';
-}
-};
-
-const setupEvents = () => {
-DOM.singleViewBtn.addEventListener('click', () => {
-state.viewMode = 'single';
-DOM.singleViewBtn.classList.add('active');
-DOM.compareViewBtn.classList.remove('active');
-renderLayout();
-});
-
-DOM.compareViewBtn.addEventListener('click', () => {
-state.viewMode = 'compare';
-DOM.compareViewBtn.classList.add('active');
-DOM.singleViewBtn.classList.remove('active');
-renderLayout();
-});
-
-document.getElementById('selectYearsBtn').addEventListener('click', openYearPopup);
-DOM.yearPopup.closeBtn.addEventListener('click', () => DOM.yearPopup.overlay.classList.remove('visible'));
-DOM.yearPopup.doneBtn.addEventListener('click', () => {
-state.analysisScopeYears = Array.from(DOM.yearPopup.list.querySelectorAll('input:checked')).map(cb => cb.value);
-DOM.yearPopup.overlay.classList.remove('visible');
-renderLayout();
-});
-
-DOM.yearPopup.search.addEventListener('input', debounce((e) => renderYearList(e.target.value), 300));
-DOM.yearPopup.sortBtn.addEventListener('click', () => {
-state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc';
-renderYearList(DOM.yearPopup.search.value);
-});
-DOM.yearPopup.selectAll.addEventListener('click', () => {
-DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
-});
-DOM.yearPopup.deselectAll.addEventListener('click', () => {
-DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-});
-
-document.getElementById('exportBtn').addEventListener('click', exportData);
-
-document.getElementById('closeExportPopupBtn').addEventListener('click', () => {
-document.getElementById('exportModalPopup').classList.remove('visible');
-});
-
-document.getElementById('copyCsvBtn').addEventListener('click', async (e) => {
-const btn = e.currentTarget;
-const text = document.getElementById('exportTextarea').value;
-const originalHtml = btn.innerHTML;
-
-const success = () => {
-btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-btn.style.background = 'var(--accent-success)';
-setTimeout(() => {
-btn.innerHTML = originalHtml;
-btn.style.background = '';
-}, 2000);
-};
-
-try {
-await navigator.clipboard.writeText(text);
-success();
-} catch (err) {
-const ta = document.getElementById('exportTextarea');
-ta.select();
-document.execCommand('copy');
-success();
-}
-});
-
-DOM.filtersArea.addEventListener('change', (e) => {
-if(e.target.tagName === 'SELECT') {
-const side = e.target.dataset.side;
-const filter = e.target.dataset.filter;
-const filterObj = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-
-filterObj[filter] = e.target.value;
-
-if(filter === 'Region') { filterObj.Pharmacy = 'all'; filterObj.Month = 'all'; }
-if(filter === 'Pharmacy') { filterObj.Month = 'all'; }
-
-state.cachedMetrics.clear();
-updateFilterOptions(side);
-updateResults();
-}
-});
-
-DOM.filtersArea.addEventListener('click', (e) => {
-if(e.target.closest('.reset-filter-btn')) {
-const btn = e.target.closest('.reset-filter-btn');
-const side = btn.dataset.side;
-const filter = btn.dataset.filter;
-const filterObj = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-
-filterObj[filter] = 'all';
-const selectEl = document.getElementById(`${filter}-${side}`);
-if(selectEl) selectEl.value = 'all';
-
-state.cachedMetrics.clear();
-updateFilterOptions(side);
-updateResults();
-}
-});
-
-DOM.resultsContainer.addEventListener('click', (e) => {
-const tr = e.target.closest('tr');
-if(tr && tr.parentNode.tagName === 'TBODY') {
-const table = tr.closest('table');
-const isFocused = tr.classList.contains('row-focused');
-
-table.querySelectorAll('tr').forEach(r => {
-r.classList.remove('row-focused', 'row-dimmed');
-});
-
-if (!isFocused) {
-tr.classList.add('row-focused');
-table.querySelectorAll('tbody tr').forEach(r => {
-if(r !== tr) r.classList.add('row-dimmed');
-});
-}
-}
-});
-};
-
-const openYearPopup = () => {
-renderYearList();
-DOM.yearPopup.overlay.classList.add('visible');
-};
-
-const renderYearList = (searchTerm = '') => {
-let years = [...state.allYears];
-years.sort((a,b) => state.yearSortOrder === 'desc' ? b-a : a-b);
-if(searchTerm) {
-years = years.filter(y => y.includes(searchTerm) || `${y-1}-${y}`.includes(searchTerm));
-}
-
-DOM.yearPopup.list.innerHTML = years.map(y => `
-<label class="popup-list-item">
-<input type="checkbox" value="${escapeHTML(y)}" ${state.analysisScopeYears.includes(String(y)) ? 'checked' : ''}>
-<span>${escapeHTML(y-1)} - ${escapeHTML(y)}</span>
-</label>
-`).join('');
-};
-
-const getFilteredData = (filters) => {
-return state.allData.filter(row =>
-(filters.Year === 'all' || !filters.Year || row.Year == filters.Year) &&
-(filters.Region === 'all' || row.Region == filters.Region) &&
-(filters.Pharmacy === 'all' || row.Pharmacy == filters.Pharmacy) &&
-(filters.Month === 'all' || row.Month == filters.Month) &&
-(filters.Class === 'all' || row.Class == filters.Class)
-);
-};
-
-const calculateMetrics = (data, filters) => {
-const cacheKey = JSON.stringify(filters);
-if(state.cachedMetrics.has(cacheKey)) return state.cachedMetrics.get(cacheKey);
-
-const metrics = { 'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0 };
-METRICS_CONFIG.forEach(m => metrics[m] = 0);
-
-data.forEach(row => {
-metrics['Total Prescriptions'] += parseFloat(row['Total Prescription'] || 0);
-metrics['Insurance Covered'] += parseFloat(row['Insurance Covered Prescription'] || 0);
-METRICS_CONFIG.forEach(cat => {
-const val = parseFloat(row[cat] || 0);
-metrics[cat] += val;
-metrics['Total Value'] += val;
-});
-});
-
-const allPharmacies = [...new Set(state.allData.filter(r => r.Year == filters.Year).map(r => r.Pharmacy))];
-const relevantPharmacies = filters.Pharmacy !== 'all' ? [filters.Pharmacy] : allPharmacies;
-const expectedCount = relevantPharmacies.length * (filters.Month !== 'all' ? 1 : 12);
-const actualEntries = new Set(data.map(r => r.Pharmacy + r.Month)).size;
-
-metrics['Active Pharmacies'] = new Set(data.map(r => r.Pharmacy)).size;
-metrics['Inactive Count'] = Math.max(0, expectedCount - actualEntries);
-
-state.cachedMetrics.set(cacheKey, metrics);
-return metrics;
-};
-
-const renderLayout = () => {
-DOM.mainControlsPanel.style.display = state.viewMode === 'single' ? 'flex' : 'none';
-DOM.filtersArea.className = `filters-area ${state.viewMode}-view`;
-DOM.filtersArea.innerHTML = '';
-
-if (state.viewMode === 'single') {
-renderSelectedYearTags();
-DOM.filtersArea.appendChild(createFilterSet('A', 'Filters', 'fa-filter', 'var(--accent-primary)'));
-} else {
-DOM.filtersArea.appendChild(createFilterSet('A', 'Left Scope', 'fa-sliders-h', 'var(--accent-primary)'));
-const div = document.createElement('div');
-div.className = 'comparison-divider';
-div.innerHTML = '<span>VS</span>';
-DOM.filtersArea.appendChild(div);
-DOM.filtersArea.appendChild(createFilterSet('B', 'Right Scope', 'fa-sliders-h', 'var(--accent-secondary)'));
-}
-
-updateFilterOptions('A');
-if(state.viewMode === 'compare') updateFilterOptions('B');
-updateResults();
-};
-
-const createFilterSet = (side, title, iconClass, iconColor) => {
-const el = document.createElement('div');
-el.className = `filter-set glass-panel side-${side.toLowerCase()}`;
-const filters = ['Region', 'Pharmacy', 'Month', 'Class'];
-if(state.viewMode === 'compare') filters.unshift('Year');
-
-el.innerHTML = `
-<div class="filter-set-title"><i class="fas ${iconClass}" style="color: ${iconColor};"></i> ${escapeHTML(title)}</div>
-<div class="filter-grid">
-${filters.map(f => `
-<div class="filter-group">
-<label>${escapeHTML(f)}</label>
-<select data-side="${side}" data-filter="${escapeHTML(f)}" id="${escapeHTML(f)}-${side}"></select>
-<button class="reset-filter-btn" data-side="${side}" data-filter="${escapeHTML(f)}"><i class="fas fa-undo-alt"></i></button>
-</div>
-`).join('')}
-</div>
-`;
-return el;
-};
-
-const updateFilterOptions = (side) => {
-const filters = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
-const keys = ['Region', 'Pharmacy', 'Month', 'Class'];
-if(state.viewMode === 'compare') keys.unshift('Year');
-
-keys.forEach(key => {
-const select = document.getElementById(`${key}-${side}`);
-if(!select) return;
-
-const dataContext = getFilteredData({...filters, [key]: 'all'});
-let options = [...new Set(dataContext.map(r => r[key]))].filter(Boolean);
-
-if(key === 'Year') options.sort((a,b) => b-a);
-else if(key === 'Month') options.sort((a,b) => (MONTH_ORDER[a.toLowerCase()]||99) - (MONTH_ORDER[b.toLowerCase()]||99));
-else options.sort();
-
-const currentVal = filters[key];
-select.innerHTML = `<option value="all">All ${escapeHTML(key)}s</option>` + options.map(o => `<option value="${escapeHTML(o)}">${key==='Year'? escapeHTML(o-1)+'-'+escapeHTML(o) : escapeHTML(o)}</option>`).join('');
-select.value = options.includes(currentVal) ? currentVal : 'all';
-
-if(select.value !== currentVal) filters[key] = select.value;
-});
-};
-
-const updateResults = () => {
-DOM.resultsContainer.innerHTML = '';
-
-if (state.viewMode === 'single') {
-if (state.analysisScopeYears.length === 0) {
-DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-calendar-times"></i><span>Please select at least one year.</span></div>';
-return;
-}
-
-const metricsMap = {};
-state.analysisScopeYears.forEach(y => {
-metricsMap[y] = calculateMetrics(getFilteredData({...state.singleFilters, Year: y}), {...state.singleFilters, Year: y});
-});
-
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
-const years = state.analysisScopeYears.sort((a,b) => b-a);
-
-let html = `
-<div class="single-view-scroll-wrapper">
-<table class="results-table single-view-table">
-<thead>
-<tr>
-<th style="min-width:250px;">Metric</th>
-${years.map(y => `<th style="text-align: right;">${escapeHTML(y-1)} - ${escapeHTML(y)}</th>`).join('')}
-</tr>
-</thead>
-<tbody>`;
-
-allMetrics.forEach(metric => {
-const values = years.map(y => metricsMap[y][metric]);
-const max = Math.max(...values);
-const min = Math.min(...values);
-const isVaried = max !== min && max > 0;
-
-html += `<tr>
-<td class="metric-name">${escapeHTML(metric)}</td>
-${years.map((y, idx) => {
-const val = metricsMap[y][metric];
-let classExtra = '';
-if(isVaried) {
-if(val === max) classExtra = 'cell-max';
-else if(val === min) classExtra = 'cell-min';
-}
-return `<td class="numeric ${classExtra}">${formatNumber(val)}</td>`;
-}).join('')}
-</tr>`;
-});
-html += `</tbody></table></div>`;
-DOM.resultsContainer.innerHTML = html;
-
-} else {
-const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA), state.compareFiltersA);
-const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB), state.compareFiltersB);
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
-
-const renderSide = (metrics, comparisonMetrics, sideName, sideClass) => {
-let html = `
-<div class="compare-table ${sideClass}">
-<div class="compare-table-header">${escapeHTML(sideName)}</div>
-<div class="compare-table-content">
-<table class="results-table compare-view-table">
-<thead>
-<tr><th>Metric</th><th style="text-align:right">Value</th></tr>
-</thead>
-<tbody>`;
-allMetrics.forEach(m => {
-const val = metrics[m];
-const compVal = comparisonMetrics ? comparisonMetrics[m] : null;
-let pill = '';
-
-if(comparisonMetrics) {
-const diff = val - compVal;
-const pct = compVal ? (diff / compVal) * 100 : 0;
-if(Math.abs(pct) > 0.1) {
-const isPos = diff > 0;
-pill = `<span class="comparison-pill ${isPos?'positive':'negative'}">${isPos?'+':''}${pct.toFixed(1)}%</span>`;
-}
-}
-
-html += `<tr>
-<td class="metric-name">${escapeHTML(m)}</td>
-<td class="numeric">
-<div class="numeric-cell-content">
-${pill} <span>${formatNumber(val)}</span>
-</div>
-</td>
-</tr>`;
-});
-html += `</tbody></table></div></div>`;
-return html;
-};
-
-const container = document.createElement('div');
-container.className = 'compare-tables-container';
-
-const getTitle = (f) => f.Year !== 'all' ? `${f.Year-1} - ${f.Year}` : 'All Years';
-
-container.innerHTML = renderSide(metricsA, metricsB, getTitle(state.compareFiltersA), 'side-a')
-+ renderSide(metricsB, metricsA, getTitle(state.compareFiltersB), 'side-b');
-
-DOM.resultsContainer.appendChild(container);
-
-const panes = container.querySelectorAll('.compare-table-content');
-let isSyncing = false;
-panes[0].addEventListener('scroll', function() {
-if(!isSyncing) { isSyncing=true; panes[1].scrollTop = this.scrollTop; setTimeout(()=>isSyncing=false, 20); }
-});
-panes[1].addEventListener('scroll', function() {
-if(!isSyncing) { isSyncing=true; panes[0].scrollTop = this.scrollTop; setTimeout(()=>isSyncing=false, 20); }
-});
-}
-};
-
-const renderSelectedYearTags = () => {
-const container = document.getElementById('selectedYearsContainer');
-container.innerHTML = state.analysisScopeYears.map(y => {
-const safeY = escapeHTML(y);
-const safeJSY = escapeHTML(String(y).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-return `
-<span class="year-tag">
-<i class="fas fa-check-circle"></i> ${escapeHTML(y-1)} - ${safeY}
-<button class="remove-tag-btn" onclick="removeYear('${safeJSY}')"><i class="fas fa-times"></i></button>
-</span>
-`;
-}).join('');
-};
-
-window.removeYear = (y) => {
-state.analysisScopeYears = state.analysisScopeYears.filter(year => year !== String(y));
-renderLayout();
-};
-
-const exportData = () => {
-const data = [];
-let filterHeaders = "";
-const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
-
-if(state.viewMode === 'single') {
-const f = state.singleFilters;
-filterHeaders = `"Dashboard View:","Single View"\r\n"Applied Filters:","Region: ${f.Region} | Pharmacy: ${f.Pharmacy} | Month: ${f.Month} | Class: ${f.Class}"\r\n\r\n`;
-
-allMetrics.forEach(m => {
-const row = { Metric: m };
-state.analysisScopeYears.forEach(y => {
-const filters = {...f, Year: y};
-const mets = calculateMetrics(getFilteredData(filters), filters);
-row[`${y-1}-${y}`] = `="${formatNumber(mets[m])}"`;
-});
-data.push(row);
-});
-} else {
-const fA = state.compareFiltersA;
-const fB = state.compareFiltersB;
-filterHeaders = `"Dashboard View:","Compare View"\r\n"Side A Filters:","Year: ${fA.Year} | Region: ${fA.Region} | Pharmacy: ${fA.Pharmacy} | Month: ${fA.Month} | Class: ${fA.Class}"\r\n"Side B Filters:","Year: ${fB.Year} | Region: ${fB.Region} | Pharmacy: ${fB.Pharmacy} | Month: ${fB.Month} | Class: ${fB.Class}"\r\n\r\n`;
-
-const metricsA = calculateMetrics(getFilteredData(fA), fA);
-const metricsB = calculateMetrics(getFilteredData(fB), fB);
-
-allMetrics.forEach(m => {
-data.push({
-Metric: m,
-[`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: `="${formatNumber(metricsA[m])}"`,
-[`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: `="${formatNumber(metricsB[m])}"`
-});
-});
-}
-
-if(data.length) {
-const csv = Papa.unparse(data);
-const finalCsv = filterHeaders + csv;
-
-try {
-const blob = new Blob(['\uFEFF' + finalCsv], { type: 'text/csv;charset=utf-8;' });
-const url = URL.createObjectURL(blob);
-const link = document.createElement('a');
-link.href = url;
-link.download = `dashboard_export_${Date.now()}.csv`;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-URL.revokeObjectURL(url);
-} catch(e) {
-console.warn("Download blocked by environment security settings.");
-}
-
-document.getElementById('exportTextarea').value = finalCsv;
-document.getElementById('exportModalPopup').classList.add('visible');
-}
-};
-
-init();
+  const SHEET_ID = '122uThrt83Vs8rUtOe4PCmsWjLSxv8A-OmUbT0Y3PZeg';
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+  const METRICS_CONFIG = ['المسكنات','مضادات حيوية','كلي','نفسية و عصبية','قلب','سكر حقن','سكر فم','نسا','كبد','جهاز هضمي','جهاز تنفسي','امراض جلدية','عيون و رمد','انف و اذن','مضادات تقلصات','اورام','فيتامينات','مختلفة'];
+  const MONTH_ORDER = { july:1, august:2, september:3, october:4, november:5, december:6, january:7, february:8, march:9, april:10, may:11, june:12, 'يوليو':1,'أغسطس':2,'سبتمبر':3,'أكتوبر':4,'نوفمبر':5,'ديسمبر':6,'يناير':7,'فبراير':8,'مارس':9,'أبريل':10,'مايو':11,'يونيو':12 };
+
+  const state = {
+    allData: [],
+    allYears: [],
+    viewMode: 'single',
+    analysisScopeYears: [],
+    singleFilters: { Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
+    compareFiltersA: { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
+    compareFiltersB: { Year: 'all', Region: 'all', Pharmacy: 'all', Month: 'all', Class: 'all' },
+    cachedMetrics: new Map(),
+    yearSortOrder: 'desc'
+  };
+
+  const DOM = {
+    singleViewBtn: document.getElementById('singleViewBtn'),
+    compareViewBtn: document.getElementById('compareViewBtn'),
+    filtersArea: document.getElementById('filtersArea'),
+    resultsContainer: document.getElementById('resultsContainer'),
+    mainControlsPanel: document.getElementById('mainControlsPanel'),
+    yearPopup: {
+      overlay: document.getElementById('yearSelectorPopup'),
+      list: document.getElementById('yearList'),
+      search: document.getElementById('yearSearchInput'),
+      sortBtn: document.getElementById('sortYearsBtn'),
+      selectAll: document.getElementById('selectAllYearsBtn'),
+      deselectAll: document.getElementById('deselectAllYearsBtn'),
+      doneBtn: document.getElementById('donePopupBtn'),
+      closeBtn: document.getElementById('closePopupBtn')
+    }
+  };
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  };
+
+  const formatNumber = (num) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0';
+
+  const init = async () => {
+    DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-circle-notch fa-spin" style="color: var(--accent-primary);"></i><span>Loading Data...</span></div>';
+    try {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      Papa.parse(text, { header: true, skipEmptyLines: true, complete: (results) => {
+        state.allData = results.data.filter(r => r && r.Year && r.Year.trim() !== '');
+        state.allYears = [...new Set(state.allData.map(r => r.Year))].sort((a,b) => b-a);
+        state.analysisScopeYears = state.allYears.slice(0, 3);
+        if (state.allYears.length > 0) state.compareFiltersA.Year = state.allYears[0];
+        if (state.allYears.length > 1) state.compareFiltersB.Year = state.allYears[1];
+        renderLayout();
+        setupEvents();
+      }});
+    } catch (e) {
+      DOM.resultsContainer.innerHTML = '<div class="state-message error"><i class="fas fa-exclamation-triangle"></i><span>Error loading data. Refresh page.</span></div>';
+    }
+  };
+
+  const setupEvents = () => {
+    DOM.singleViewBtn.addEventListener('click', () => {
+      state.viewMode = 'single';
+      DOM.singleViewBtn.classList.add('active');
+      DOM.compareViewBtn.classList.remove('active');
+      renderLayout();
+    });
+
+    DOM.compareViewBtn.addEventListener('click', () => {
+      state.viewMode = 'compare';
+      DOM.compareViewBtn.classList.add('active');
+      DOM.singleViewBtn.classList.remove('active');
+      renderLayout();
+    });
+
+    document.getElementById('selectYearsBtn').addEventListener('click', openYearPopup);
+    DOM.yearPopup.closeBtn.addEventListener('click', () => DOM.yearPopup.overlay.classList.remove('visible'));
+
+    DOM.yearPopup.doneBtn.addEventListener('click', () => {
+      state.analysisScopeYears = Array.from(DOM.yearPopup.list.querySelectorAll('input:checked')).map(cb => cb.value);
+      DOM.yearPopup.overlay.classList.remove('visible');
+      renderLayout();
+    });
+
+    DOM.yearPopup.search.addEventListener('input', debounce((e) => renderYearList(e.target.value), 300));
+
+    DOM.yearPopup.sortBtn.addEventListener('click', () => {
+      state.yearSortOrder = state.yearSortOrder === 'desc' ? 'asc' : 'desc';
+      renderYearList(DOM.yearPopup.search.value);
+    });
+
+    DOM.yearPopup.selectAll.addEventListener('click', () => {
+      DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+
+    DOM.yearPopup.deselectAll.addEventListener('click', () => {
+      DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportData);
+
+    document.getElementById('closeExportPopupBtn').addEventListener('click', () => {
+      document.getElementById('exportModalPopup').classList.remove('visible');
+    });
+
+    document.getElementById('copyCsvBtn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const text = document.getElementById('exportTextarea').value;
+      const originalHtml = btn.innerHTML;
+      const success = () => {
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.style.background = 'var(--accent-success)';
+        setTimeout(() => { btn.innerHTML = originalHtml; btn.style.background = ''; }, 2000);
+      };
+      try {
+        await navigator.clipboard.writeText(text);
+        success();
+      } catch (err) {
+        const ta = document.getElementById('exportTextarea');
+        ta.select();
+        document.execCommand('copy');
+        success();
+      }
+    });
+
+    DOM.filtersArea.addEventListener('change', (e) => {
+      if (e.target.tagName === 'SELECT') {
+        const side = e.target.dataset.side;
+        const filter = e.target.dataset.filter;
+        const filterObj = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
+        filterObj[filter] = e.target.value;
+        if (filter === 'Region') { filterObj.Pharmacy = 'all'; filterObj.Month = 'all'; }
+        if (filter === 'Pharmacy') { filterObj.Month = 'all'; }
+        state.cachedMetrics.clear();
+        updateFilterOptions(side);
+        updateResults();
+      }
+    });
+
+    DOM.filtersArea.addEventListener('click', (e) => {
+      if (e.target.closest('.reset-filter-btn')) {
+        const btn = e.target.closest('.reset-filter-btn');
+        const side = btn.dataset.side;
+        const filter = btn.dataset.filter;
+        const filterObj = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
+        filterObj[filter] = 'all';
+        const selectEl = document.getElementById(`${filter}-${side}`);
+        if (selectEl) selectEl.value = 'all';
+        state.cachedMetrics.clear();
+        updateFilterOptions(side);
+        updateResults();
+      }
+    });
+
+    DOM.resultsContainer.addEventListener('click', (e) => {
+      const tr = e.target.closest('tr');
+      if (tr && tr.parentNode.tagName === 'TBODY') {
+        const table = tr.closest('table');
+        const isFocused = tr.classList.contains('row-focused');
+        table.querySelectorAll('tr').forEach(r => r.classList.remove('row-focused', 'row-dimmed'));
+        if (!isFocused) {
+          tr.classList.add('row-focused');
+          table.querySelectorAll('tbody tr').forEach(r => { if (r !== tr) r.classList.add('row-dimmed'); });
+        }
+      }
+    });
+  };
+
+  const openYearPopup = () => {
+    renderYearList();
+    DOM.yearPopup.overlay.classList.add('visible');
+  };
+
+  const renderYearList = (searchTerm = '') => {
+    let years = [...state.allYears];
+    years.sort((a,b) => state.yearSortOrder === 'desc' ? b-a : a-b);
+    if (searchTerm) years = years.filter(y => y.includes(searchTerm) || `${y-1}-${y}`.includes(searchTerm));
+    DOM.yearPopup.list.innerHTML = years.map(y => `
+      <label class="popup-list-item">
+        <input type="checkbox" value="${escapeHTML(y)}" ${state.analysisScopeYears.includes(String(y)) ? 'checked' : ''}>
+        <span>${escapeHTML(y-1)} - ${escapeHTML(y)}</span>
+      </label>
+    `).join('');
+  };
+
+  const getFilteredData = (filters) => {
+    return state.allData.filter(row =>
+      (filters.Year === 'all' || !filters.Year || row.Year == filters.Year) &&
+      (filters.Region === 'all' || row.Region == filters.Region) &&
+      (filters.Pharmacy === 'all' || row.Pharmacy == filters.Pharmacy) &&
+      (filters.Month === 'all' || row.Month == filters.Month) &&
+      (filters.Class === 'all' || row.Class == filters.Class)
+    );
+  };
+
+  const calculateMetrics = (data, filters) => {
+    const cacheKey = JSON.stringify(filters);
+    if (state.cachedMetrics.has(cacheKey)) return state.cachedMetrics.get(cacheKey);
+
+    const metrics = { 'Total Value': 0, 'Total Prescriptions': 0, 'Insurance Covered': 0 };
+    METRICS_CONFIG.forEach(m => metrics[m] = 0);
+
+    data.forEach(row => {
+      metrics['Total Prescriptions'] += parseFloat(row['Total Prescription'] || 0);
+      metrics['Insurance Covered'] += parseFloat(row['Insurance Covered Prescription'] || 0);
+      METRICS_CONFIG.forEach(cat => {
+        const val = parseFloat(row[cat] || 0);
+        metrics[cat] += val;
+        metrics['Total Value'] += val;
+      });
+    });
+
+    const allPharmacies = [...new Set(state.allData.filter(r => r.Year == filters.Year).map(r => r.Pharmacy))];
+    const relevantPharmacies = filters.Pharmacy !== 'all' ? [filters.Pharmacy] : allPharmacies;
+    const expectedCount = relevantPharmacies.length * (filters.Month !== 'all' ? 1 : 12);
+    const actualEntries = new Set(data.map(r => r.Pharmacy + r.Month)).size;
+
+    metrics['Active Pharmacies'] = new Set(data.map(r => r.Pharmacy)).size;
+    metrics['Inactive Count'] = Math.max(0, expectedCount - actualEntries);
+
+    state.cachedMetrics.set(cacheKey, metrics);
+    return metrics;
+  };
+
+  const renderLayout = () => {
+    DOM.mainControlsPanel.style.display = state.viewMode === 'single' ? 'flex' : 'none';
+    DOM.filtersArea.className = `filters-area ${state.viewMode}-view`;
+    DOM.filtersArea.innerHTML = '';
+
+    if (state.viewMode === 'single') {
+      renderSelectedYearTags();
+      DOM.filtersArea.appendChild(createFilterSet('A', 'Filters', 'fa-filter', 'var(--accent-primary)'));
+    } else {
+      DOM.filtersArea.appendChild(createFilterSet('A', 'Left Scope', 'fa-sliders-h', 'var(--accent-primary)'));
+      const div = document.createElement('div');
+      div.className = 'comparison-divider';
+      div.innerHTML = '<span>VS</span>';
+      DOM.filtersArea.appendChild(div);
+      DOM.filtersArea.appendChild(createFilterSet('B', 'Right Scope', 'fa-sliders-h', 'var(--accent-secondary)'));
+    }
+
+    updateFilterOptions('A');
+    if (state.viewMode === 'compare') updateFilterOptions('B');
+    updateResults();
+  };
+
+  const createFilterSet = (side, title, iconClass, iconColor) => {
+    const el = document.createElement('div');
+    el.className = `filter-set glass-panel side-${side.toLowerCase()}`;
+    const filters = ['Region', 'Pharmacy', 'Month', 'Class'];
+    if (state.viewMode === 'compare') filters.unshift('Year');
+    el.innerHTML = `
+      <div class="filter-set-title"><i class="fas ${iconClass}" style="color: ${iconColor};"></i> ${escapeHTML(title)}</div>
+      <div class="filter-grid">
+        ${filters.map(f => `
+          <div class="filter-group">
+            <label>${escapeHTML(f)}</label>
+            <select data-side="${side}" data-filter="${escapeHTML(f)}" id="${escapeHTML(f)}-${side}"></select>
+            <button class="reset-filter-btn" data-side="${side}" data-filter="${escapeHTML(f)}"><i class="fas fa-undo-alt"></i></button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return el;
+  };
+
+  const updateFilterOptions = (side) => {
+    const filters = state.viewMode === 'single' ? state.singleFilters : (side === 'A' ? state.compareFiltersA : state.compareFiltersB);
+    const keys = ['Region', 'Pharmacy', 'Month', 'Class'];
+    if (state.viewMode === 'compare') keys.unshift('Year');
+
+    keys.forEach(key => {
+      const select = document.getElementById(`${key}-${side}`);
+      if (!select) return;
+      const dataContext = getFilteredData({...filters, [key]: 'all'});
+      let options = [...new Set(dataContext.map(r => r[key]))].filter(Boolean);
+      if (key === 'Year') options.sort((a,b) => b-a);
+      else if (key === 'Month') options.sort((a,b) => (MONTH_ORDER[a.toLowerCase()]||99) - (MONTH_ORDER[b.toLowerCase()]||99));
+      else options.sort();
+      const currentVal = filters[key];
+      select.innerHTML = `<option value="all">All ${escapeHTML(key)}s</option>` + options.map(o => `<option value="${escapeHTML(o)}">${key==='Year' ? escapeHTML(o-1)+'-'+escapeHTML(o) : escapeHTML(o)}</option>`).join('');
+      select.value = options.includes(currentVal) ? currentVal : 'all';
+      if (select.value !== currentVal) filters[key] = select.value;
+    });
+  };
+
+  const updateResults = () => {
+    DOM.resultsContainer.innerHTML = '';
+
+    if (state.viewMode === 'single') {
+      if (state.analysisScopeYears.length === 0) {
+        DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-calendar-times"></i><span>Please select at least one year.</span></div>';
+        return;
+      }
+
+      const metricsMap = {};
+      state.analysisScopeYears.forEach(y => {
+        metricsMap[y] = calculateMetrics(getFilteredData({...state.singleFilters, Year: y}), {...state.singleFilters, Year: y});
+      });
+
+      const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
+      const years = state.analysisScopeYears.sort((a,b) => b-a);
+
+      let html = `
+        <div class="single-view-scroll-wrapper">
+          <table class="results-table single-view-table">
+            <thead>
+              <tr>
+                <th style="min-width:250px;">Metric</th>
+                ${years.map(y => `<th style="text-align: right;">${escapeHTML(y-1)} - ${escapeHTML(y)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>`;
+
+      allMetrics.forEach(metric => {
+        const values = years.map(y => metricsMap[y][metric]);
+        const max = Math.max(...values);
+        const min = Math.min(...values);
+        const isVaried = max !== min && max > 0;
+        html += `<tr>
+          <td class="metric-name">${escapeHTML(metric)}</td>
+          ${years.map(y => {
+            const val = metricsMap[y][metric];
+            let classExtra = '';
+            if (isVaried) {
+              if (val === max) classExtra = 'cell-max';
+              else if (val === min) classExtra = 'cell-min';
+            }
+            return `<td class="numeric ${classExtra}">${formatNumber(val)}</td>`;
+          }).join('')}
+        </tr>`;
+      });
+
+      html += `</tbody></table></div>`;
+      DOM.resultsContainer.innerHTML = html;
+
+    } else {
+      const metricsA = calculateMetrics(getFilteredData(state.compareFiltersA), state.compareFiltersA);
+      const metricsB = calculateMetrics(getFilteredData(state.compareFiltersB), state.compareFiltersB);
+      const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
+
+      const renderSide = (metrics, comparisonMetrics, sideName, sideClass) => {
+        let html = `
+          <div class="compare-table ${sideClass}">
+            <div class="compare-table-header">${escapeHTML(sideName)}</div>
+            <div class="compare-table-content">
+              <table class="results-table compare-view-table">
+                <thead><tr><th>Metric</th><th style="text-align:right">Value</th></tr></thead>
+                <tbody>`;
+        allMetrics.forEach(m => {
+          const val = metrics[m];
+          const compVal = comparisonMetrics ? comparisonMetrics[m] : null;
+          let pill = '';
+          if (comparisonMetrics) {
+            const diff = val - compVal;
+            const pct = compVal ? (diff / compVal) * 100 : 0;
+            if (Math.abs(pct) > 0.1) {
+              const isPos = diff > 0;
+              pill = `<span class="comparison-pill ${isPos?'positive':'negative'}">${isPos?'+':''}${pct.toFixed(1)}%</span>`;
+            }
+          }
+          html += `<tr>
+            <td class="metric-name">${escapeHTML(m)}</td>
+            <td class="numeric"><div class="numeric-cell-content">${pill} <span>${formatNumber(val)}</span></div></td>
+          </tr>`;
+        });
+        html += `</tbody></table></div></div>`;
+        return html;
+      };
+
+      const container = document.createElement('div');
+      container.className = 'compare-tables-container';
+      const getTitle = (f) => f.Year !== 'all' ? `${f.Year-1} - ${f.Year}` : 'All Years';
+      container.innerHTML = renderSide(metricsA, metricsB, getTitle(state.compareFiltersA), 'side-a')
+                          + renderSide(metricsB, metricsA, getTitle(state.compareFiltersB), 'side-b');
+      DOM.resultsContainer.appendChild(container);
+
+      const panes = container.querySelectorAll('.compare-table-content');
+      let isSyncing = false;
+      panes[0].addEventListener('scroll', function() {
+        if (!isSyncing) { isSyncing = true; panes[1].scrollTop = this.scrollTop; setTimeout(() => isSyncing = false, 20); }
+      });
+      panes[1].addEventListener('scroll', function() {
+        if (!isSyncing) { isSyncing = true; panes[0].scrollTop = this.scrollTop; setTimeout(() => isSyncing = false, 20); }
+      });
+    }
+  };
+
+  const renderSelectedYearTags = () => {
+    const container = document.getElementById('selectedYearsContainer');
+    container.innerHTML = state.analysisScopeYears.map(y => {
+      const safeY = escapeHTML(y);
+      const safeJSY = escapeHTML(String(y).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+      return `
+        <span class="year-tag">
+          <i class="fas fa-check-circle"></i> ${escapeHTML(y-1)} - ${safeY}
+          <button class="remove-tag-btn" onclick="removeYear('${safeJSY}')"><i class="fas fa-times"></i></button>
+        </span>
+      `;
+    }).join('');
+  };
+
+  window.removeYear = (y) => {
+    state.analysisScopeYears = state.analysisScopeYears.filter(year => year !== String(y));
+    renderLayout();
+  };
+
+  const exportData = () => {
+    const data = [];
+    let filterHeaders = '';
+    const allMetrics = ['Total Value', 'Total Prescriptions', 'Active Pharmacies', ...METRICS_CONFIG];
+
+    if (state.viewMode === 'single') {
+      const f = state.singleFilters;
+      filterHeaders = `"Dashboard View:","Single View"\r\n"Applied Filters:","Region: ${f.Region} | Pharmacy: ${f.Pharmacy} | Month: ${f.Month} | Class: ${f.Class}"\r\n\r\n`;
+      allMetrics.forEach(m => {
+        const row = { Metric: m };
+        state.analysisScopeYears.forEach(y => {
+          const filters = {...f, Year: y};
+          const mets = calculateMetrics(getFilteredData(filters), filters);
+          row[`${y-1}-${y}`] = `="${formatNumber(mets[m])}"`;
+        });
+        data.push(row);
+      });
+    } else {
+      const fA = state.compareFiltersA;
+      const fB = state.compareFiltersB;
+      filterHeaders = `"Dashboard View:","Compare View"\r\n"Side A Filters:","Year: ${fA.Year} | Region: ${fA.Region} | Pharmacy: ${fA.Pharmacy} | Month: ${fA.Month} | Class: ${fA.Class}"\r\n"Side B Filters:","Year: ${fB.Year} | Region: ${fB.Region} | Pharmacy: ${fB.Pharmacy} | Month: ${fB.Month} | Class: ${fB.Class}"\r\n\r\n`;
+      const metricsA = calculateMetrics(getFilteredData(fA), fA);
+      const metricsB = calculateMetrics(getFilteredData(fB), fB);
+      allMetrics.forEach(m => {
+        data.push({
+          Metric: m,
+          [`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: `="${formatNumber(metricsA[m])}"`,
+          [`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: `="${formatNumber(metricsB[m])}"`
+        });
+      });
+    }
+
+    if (data.length) {
+      const csv = Papa.unparse(data);
+      const finalCsv = filterHeaders + csv;
+
+      const blob = new Blob(['\uFEFF' + finalCsv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `dashboard_export_${Date.now()}.csv`;
+      link.click();
+
+      document.getElementById('exportTextarea').value = finalCsv;
+      document.getElementById('exportModalPopup').classList.add('visible');
+    }
+  };
+
+  init();
 });
 </script>
 
