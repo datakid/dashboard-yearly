@@ -201,7 +201,6 @@ gap: 1rem;
 .scope-title {
 font-weight: 700;
 color: var(--text-primary);
-font-size: 0.95rem;
 letter-spacing: -0.01em;
 text-transform: uppercase;
 font-size: 0.75rem;
@@ -358,7 +357,7 @@ border: 1px solid var(--border-primary);
 
 .filter-group select {
 width: 100%;
-padding: 0.85rem 3.5rem 0.85rem 1.1rem;
+padding: 0.85rem 4rem 0.85rem 1.1rem;
 border: 1px solid var(--border-primary);
 border-radius: var(--radius);
 background-color: rgba(255, 255, 255, 0.5);
@@ -372,7 +371,7 @@ font-family: inherit;
 box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
 background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
 background-repeat: no-repeat;
-background-position: right 1rem center;
+background-position: right 1.2rem center;
 background-size: 0.9rem;
 backdrop-filter: blur(4px);
 }
@@ -392,7 +391,7 @@ background-color: #ffffff;
 .reset-filter-btn {
 position: absolute;
 top: 50%;
-right: 2.4rem;
+right: 2.8rem;
 transform: translateY(-50%);
 background: none;
 border: none;
@@ -740,6 +739,32 @@ color: var(--text-tertiary);
 color: var(--accent-danger);
 }
 
+.export-textarea {
+width: 100%;
+height: 200px;
+padding: 1rem;
+border: 1px solid var(--border-primary);
+border-radius: var(--radius);
+font-family: monospace;
+font-size: 0.85rem;
+resize: none;
+background: var(--bg-tertiary);
+color: var(--text-primary);
+outline: none;
+white-space: pre;
+overflow: auto;
+}
+
+.export-info {
+margin-bottom: 1rem;
+padding: 1rem;
+background: rgba(14, 165, 233, 0.08);
+border-left: 4px solid var(--accent-primary);
+border-radius: 0 var(--radius) var(--radius) 0;
+font-size: 0.85rem;
+color: var(--text-secondary);
+}
+
 @media (max-width: 900px) {
 body { padding: 1rem; }
 .header { top: 0; padding: 1rem; border-radius: var(--radius-lg); }
@@ -798,6 +823,25 @@ body { padding: 1rem; }
 <div class="popup-list" id="yearList"></div>
 <div class="popup-footer">
 <button id="donePopupBtn" class="action-btn">Apply Selection</button>
+</div>
+</div>
+</div>
+
+<div class="popup-overlay" id="exportModalPopup">
+<div class="popup-content" style="max-width: 600px;">
+<div class="popup-header">
+<h2><i class="fas fa-file-csv" style="color: var(--accent-success); margin-right: 8px;"></i> Export Generated</h2>
+<button class="popup-close-btn" id="closeExportPopupBtn"><i class="fas fa-times"></i></button>
+</div>
+<div style="padding: 1.5rem;">
+<div class="export-info">
+<strong>Download initiated.</strong><br>
+If your browser or preview environment blocked the automatic download, you can safely copy the raw CSV data below and paste it into a blank text file (save as .csv) or directly into Excel. All numbers are specially formatted to prevent Excel scientific notation.
+</div>
+<textarea id="exportTextarea" class="export-textarea" readonly></textarea>
+</div>
+<div class="popup-footer">
+<button id="copyCsvBtn" class="action-btn"><i class="fas fa-copy"></i> Copy to Clipboard</button>
 </div>
 </div>
 </div>
@@ -908,6 +952,35 @@ DOM.yearPopup.list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.c
 });
 
 document.getElementById('exportBtn').addEventListener('click', exportData);
+
+document.getElementById('closeExportPopupBtn').addEventListener('click', () => {
+document.getElementById('exportModalPopup').classList.remove('visible');
+});
+
+document.getElementById('copyCsvBtn').addEventListener('click', async (e) => {
+const btn = e.currentTarget;
+const text = document.getElementById('exportTextarea').value;
+const originalHtml = btn.innerHTML;
+
+const success = () => {
+btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+btn.style.background = 'var(--accent-success)';
+setTimeout(() => {
+btn.innerHTML = originalHtml;
+btn.style.background = '';
+}, 2000);
+};
+
+try {
+await navigator.clipboard.writeText(text);
+success();
+} catch (err) {
+const ta = document.getElementById('exportTextarea');
+ta.select();
+document.execCommand('copy');
+success();
+}
+});
 
 DOM.filtersArea.addEventListener('change', (e) => {
 if(e.target.tagName === 'SELECT') {
@@ -1235,7 +1308,7 @@ const row = { Metric: m };
 state.analysisScopeYears.forEach(y => {
 const filters = {...f, Year: y};
 const mets = calculateMetrics(getFilteredData(filters), filters);
-row[`${y-1}-${y}`] = formatNumber(mets[m]);
+row[`${y-1}-${y}`] = `="${formatNumber(mets[m])}"`;
 });
 data.push(row);
 });
@@ -1250,8 +1323,8 @@ const metricsB = calculateMetrics(getFilteredData(fB), fB);
 allMetrics.forEach(m => {
 data.push({
 Metric: m,
-[`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: formatNumber(metricsA[m]),
-[`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: formatNumber(metricsB[m])
+[`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: `="${formatNumber(metricsA[m])}"`,
+[`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: `="${formatNumber(metricsB[m])}"`
 });
 });
 }
@@ -1259,11 +1332,23 @@ Metric: m,
 if(data.length) {
 const csv = Papa.unparse(data);
 const finalCsv = filterHeaders + csv;
+
+try {
 const blob = new Blob(['\uFEFF' + finalCsv], { type: 'text/csv;charset=utf-8;' });
+const url = URL.createObjectURL(blob);
 const link = document.createElement('a');
-link.href = URL.createObjectURL(blob);
+link.href = url;
 link.download = `dashboard_export_${Date.now()}.csv`;
+document.body.appendChild(link);
 link.click();
+document.body.removeChild(link);
+URL.revokeObjectURL(url);
+} catch(e) {
+console.warn("Download blocked by environment security settings.");
+}
+
+document.getElementById('exportTextarea').value = finalCsv;
+document.getElementById('exportModalPopup').classList.add('visible');
 }
 };
 
