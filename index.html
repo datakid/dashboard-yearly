@@ -1235,7 +1235,7 @@ const row = { Metric: m };
 state.analysisScopeYears.forEach(y => {
 const filters = {...f, Year: y};
 const mets = calculateMetrics(getFilteredData(filters), filters);
-row[`${y-1}-${y}`] = mets[m];
+row[`${y-1}-${y}`] = formatNumber(mets[m]);
 });
 data.push(row);
 });
@@ -1250,8 +1250,8 @@ const metricsB = calculateMetrics(getFilteredData(fB), fB);
 allMetrics.forEach(m => {
 data.push({
 Metric: m,
-[`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: metricsA[m],
-[`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: metricsB[m]
+[`Side A (${fA.Year === 'all' ? 'All' : fA.Year-1+'-'+fA.Year})`]: formatNumber(metricsA[m]),
+[`Side B (${fB.Year === 'all' ? 'All' : fB.Year-1+'-'+fB.Year})`]: formatNumber(metricsB[m])
 });
 });
 }
