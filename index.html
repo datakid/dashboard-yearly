@@ -191,8 +191,153 @@ body::after {
 
 .controls {
   display: flex;
-  gap: 0.875rem;
+  gap: 1.1rem;
   align-items: center;
+}
+
+.control-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-primary);
+  flex-shrink: 0;
+}
+
+.sync-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
+  flex-shrink: 0;
+  transition: background-color var(--tf), box-shadow var(--tf);
+}
+
+.sync-dot.stale {
+  background: var(--text-tertiary);
+  box-shadow: 0 0 0 3px rgba(148,163,184,0.14);
+}
+
+.sync-dot.pulsing {
+  animation: syncPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes syncPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.18); }
+  50% { box-shadow: 0 0 0 6px rgba(16,185,129,0.06); }
+}
+
+.auto-sync-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 99px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--tf);
+  font-family: inherit;
+}
+
+.auto-sync-toggle:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+.auto-sync-toggle i { font-size: 0.68rem; }
+
+.auto-sync-toggle.active {
+  background: var(--bg-accent);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.auto-sync-toggle.active i { color: var(--accent-success); }
+
+.sync-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  transition: var(--tf);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.sync-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); box-shadow: var(--shadow-md); }
+.sync-btn:active { transform: scale(0.92); }
+.sync-btn.syncing { color: var(--accent-primary); border-color: var(--accent-primary); pointer-events: none; }
+.sync-btn.syncing i { animation: spin 0.85s linear infinite; }
+.sync-btn:disabled { opacity: 0.6; pointer-events: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast-stack {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.1rem;
+  min-width: 220px;
+  max-width: 340px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-xl);
+  color: var(--text-primary);
+  font-size: 0.83rem;
+  font-weight: 600;
+  transform: translateX(24px);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.175,0.885,0.32,1.1), opacity 0.32s ease;
+}
+
+.toast.visible { transform: translateX(0); opacity: 1; }
+.toast i { font-size: 0.95rem; flex-shrink: 0; }
+.toast.success i { color: var(--accent-success); }
+.toast.error i { color: var(--accent-danger); }
+.toast.info i { color: var(--accent-primary); }
+
+@media (max-width: 900px) {
+  .sync-status span.sync-label-full { display: none; }
+  .control-divider { display: none; }
 }
 
 .theme-toggle {
@@ -393,13 +538,11 @@ body::after {
 
 .comparison-divider span {
   font-weight: 800;
-  font-size: 0.8rem;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--text-tertiary);
   background-color: var(--bg-secondary);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-primary);
   border-radius: 50%;
   width: 38px;
   height: 38px;
@@ -922,6 +1065,10 @@ body::after {
   .action-btn { padding: 0.52rem 1rem; font-size: 0.82rem; }
   .action-btn span { display: none; }
   .results-table th, .results-table td { padding: 0.78rem 0.9rem; }
+  .auto-sync-toggle { font-size: 0; padding: 0.4rem 0.55rem; gap: 0; }
+  .auto-sync-toggle i { font-size: 0.72rem; }
+  .toast-stack { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
+  .toast { max-width: none; }
 }
 
 @keyframes fadeInRow {
@@ -950,6 +1097,19 @@ body::after {
       <h1>Dashboard Arena</h1>
     </div>
     <div class="controls">
+      <div class="sync-cluster">
+        <div class="sync-status" id="syncStatus">
+          <span class="sync-dot" id="syncDot"></span>
+          <span class="sync-label-full" id="syncLabel">Syncing…</span>
+        </div>
+        <button class="auto-sync-toggle" id="autoSyncToggle" type="button" aria-pressed="false">
+          <i class="fas fa-circle"></i> Auto
+        </button>
+        <button class="sync-btn" id="syncBtn" aria-label="Sync now">
+          <i class="fas fa-arrows-rotate"></i>
+        </button>
+      </div>
+      <div class="control-divider"></div>
       <div class="toggle-switch">
         <button id="singleViewBtn" class="active">Single View</button>
         <button id="compareViewBtn">Compare</button>
@@ -1017,6 +1177,8 @@ body::after {
   </div>
 </div>
 
+<div class="toast-stack" id="toastStack"></div>
+
 <script>
 const escapeHTML = (str) => String(str).replace(/[&<>'"]/g, match => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[match]));
 
@@ -1035,10 +1197,22 @@ document.addEventListener('DOMContentLoaded', () => {
     compareFiltersA: {Year:'all',Region:'all',Pharmacy:'all',Month:'all',Class:'all'},
     compareFiltersB: {Year:'all',Region:'all',Pharmacy:'all',Month:'all',Class:'all'},
     cachedMetrics: new Map(),
-    yearSortOrder: 'desc'
+    yearSortOrder: 'desc',
+    lastSyncedAt: null,
+    autoSyncEnabled: localStorage.getItem('da-auto-sync') === 'true',
+    isSyncing: false
   };
 
+  const AUTO_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+  let autoSyncTimer = null;
+  let syncLabelTimer = null;
+
   const DOM = {
+    syncBtn: document.getElementById('syncBtn'),
+    syncDot: document.getElementById('syncDot'),
+    syncLabel: document.getElementById('syncLabel'),
+    autoSyncToggle: document.getElementById('autoSyncToggle'),
+    toastStack: document.getElementById('toastStack'),
     singleViewBtn: document.getElementById('singleViewBtn'),
     compareViewBtn: document.getElementById('compareViewBtn'),
     filtersArea: document.getElementById('filtersArea'),
@@ -1077,23 +1251,106 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('da-theme', next);
   });
 
-  const init = async () => {
-    DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-circle-notch fa-spin" style="color: var(--accent-primary);"></i><span>Loading data…</span></div>';
+  const showToast = (message, type = 'info', icon = 'fa-circle-info') => {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fas ${icon}"></i><span>${escapeHTML(message)}</span>`;
+    DOM.toastStack.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('visible'));
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => toast.remove(), 350);
+    }, 3200);
+  };
+
+  const formatRelativeSync = (date) => {
+    if (!date) return 'Not synced yet';
+    const seconds = Math.round((Date.now() - date.getTime()) / 1000);
+    if (seconds < 10) return 'Synced just now';
+    if (seconds < 60) return `Synced ${seconds}s ago`;
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return `Synced ${minutes}m ago`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `Synced ${hours}h ago`;
+    return `Synced ${date.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
+  };
+
+  const refreshSyncLabel = () => {
+    DOM.syncLabel.textContent = formatRelativeSync(state.lastSyncedAt);
+    const isStale = state.lastSyncedAt && (Date.now() - state.lastSyncedAt.getTime()) > AUTO_SYNC_INTERVAL_MS;
+    DOM.syncDot.classList.toggle('stale', !state.lastSyncedAt || isStale);
+  };
+
+  const setSyncingUI = (syncing) => {
+    state.isSyncing = syncing;
+    DOM.syncBtn.classList.toggle('syncing', syncing);
+    DOM.syncDot.classList.toggle('pulsing', syncing);
+    if (syncing) DOM.syncLabel.textContent = 'Syncing…';
+  };
+
+  const applyAutoSyncUI = () => {
+    DOM.autoSyncToggle.classList.toggle('active', state.autoSyncEnabled);
+    DOM.autoSyncToggle.setAttribute('aria-pressed', String(state.autoSyncEnabled));
+    if (autoSyncTimer) clearInterval(autoSyncTimer);
+    if (state.autoSyncEnabled) {
+      autoSyncTimer = setInterval(() => syncData(false), AUTO_SYNC_INTERVAL_MS);
+    }
+  };
+
+  const syncData = async (isManual, isInitial = false) => {
+    if (state.isSyncing) return;
+    setSyncingUI(true);
+    if (isInitial) {
+      DOM.resultsContainer.innerHTML = '<div class="state-message"><i class="fas fa-circle-notch fa-spin" style="color: var(--accent-primary);"></i><span>Loading data…</span></div>';
+    }
     try {
-      const res = await fetch(SHEET_URL);
+      const res = await fetch(`${SHEET_URL}${SHEET_URL.includes('?') ? '&' : '?'}_ts=${Date.now()}`);
+      if (!res.ok) throw new Error('Network response was not ok');
       const text = await res.text();
-      Papa.parse(text, {header:true, skipEmptyLines:true, complete: (results) => {
-        state.allData = results.data.filter(r => r && r.Year && r.Year.trim() !== '');
-        state.allYears = [...new Set(state.allData.map(r => r.Year))].sort((a,b) => b-a);
+      const results = await new Promise((resolve) => Papa.parse(text, {header:true, skipEmptyLines:true, complete: resolve}));
+
+      state.allData = results.data.filter(r => r && r.Year && r.Year.trim() !== '');
+      state.allYears = [...new Set(state.allData.map(r => r.Year))].sort((a,b) => b-a);
+      state.cachedMetrics.clear();
+
+      if (isInitial) {
         state.analysisScopeYears = state.allYears.slice(0,3);
         if (state.allYears.length > 0) state.compareFiltersA.Year = state.allYears[0];
         if (state.allYears.length > 1) state.compareFiltersB.Year = state.allYears[1];
-        renderLayout();
-        setupEvents();
-      }});
+      }
+
+      state.lastSyncedAt = new Date();
+      refreshSyncLabel();
+      renderLayout();
+
+      if (isManual) showToast('Data synced', 'success', 'fa-check');
+      else if (!isInitial) showToast('Auto-synced', 'success', 'fa-check');
     } catch(e) {
-      DOM.resultsContainer.innerHTML = '<div class="state-message error"><i class="fas fa-exclamation-triangle"></i><span>Error loading data. Please refresh.</span></div>';
+      if (isInitial) {
+        DOM.resultsContainer.innerHTML = '<div class="state-message error"><i class="fas fa-exclamation-triangle"></i><span>Error loading data. Please refresh.</span></div>';
+      } else {
+        showToast('Sync failed — check your connection', 'error', 'fa-triangle-exclamation');
+      }
+    } finally {
+      setSyncingUI(false);
     }
+  };
+
+  const init = async () => {
+    applyAutoSyncUI();
+    refreshSyncLabel();
+    syncLabelTimer = setInterval(refreshSyncLabel, 20000);
+
+    DOM.syncBtn.addEventListener('click', () => syncData(true));
+    DOM.autoSyncToggle.addEventListener('click', () => {
+      state.autoSyncEnabled = !state.autoSyncEnabled;
+      localStorage.setItem('da-auto-sync', String(state.autoSyncEnabled));
+      applyAutoSyncUI();
+      showToast(state.autoSyncEnabled ? 'Auto-sync enabled' : 'Auto-sync disabled', 'info', state.autoSyncEnabled ? 'fa-toggle-on' : 'fa-toggle-off');
+    });
+
+    await syncData(false, true);
+    setupEvents();
   };
 
   const setupEvents = () => {
