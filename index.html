@@ -369,15 +369,17 @@ body::after {
 .theme-toggle:active { transform: scale(0.92); }
 
 .theme-toggle .icon-sun,
-.theme-toggle .icon-moon {
+.theme-toggle .icon-moon,
+.theme-toggle .icon-system {
   position: absolute;
+  transform: scale(0);
+  opacity: 0;
   transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.1), opacity 0.3s ease;
 }
 
-[data-theme="light"] .icon-sun { transform: scale(1); opacity: 1; }
-[data-theme="light"] .icon-moon { transform: scale(0) rotate(90deg); opacity: 0; }
-[data-theme="dark"] .icon-sun { transform: scale(0) rotate(-90deg); opacity: 0; }
-[data-theme="dark"] .icon-moon { transform: scale(1); opacity: 1; }
+[data-theme-pref="light"] .icon-sun { transform: scale(1); opacity: 1; }
+[data-theme-pref="dark"] .icon-moon { transform: scale(1); opacity: 1; }
+[data-theme-pref="system"] .icon-system { transform: scale(1); opacity: 1; }
 
 .toggle-switch {
   display: flex;
@@ -1098,7 +1100,8 @@ body::after {
         <button id="compareViewBtn">Compare</button>
         <div class="toggle-indicator"></div>
       </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-circle-half-stroke icon-system"></i>
         <i class="fas fa-sun icon-sun"></i>
         <i class="fas fa-moon icon-moon"></i>
       </button>
@@ -1225,13 +1228,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const themeToggle = document.getElementById('themeToggle');
   const html = document.documentElement;
-  const savedTheme = localStorage.getItem('da-theme') || 'light';
-  html.setAttribute('data-theme', savedTheme);
+  const THEME_KEY = 'da-theme';
+  const THEME_ORDER = ['system', 'light', 'dark'];
+  const prefersDarkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const resolveTheme = (pref) => pref === 'system' ? (prefersDarkMQ.matches ? 'dark' : 'light') : pref;
+
+  let themePref = localStorage.getItem(THEME_KEY);
+  if (!THEME_ORDER.includes(themePref)) themePref = 'system';
+
+  const applyTheme = (pref) => {
+    themePref = pref;
+    html.setAttribute('data-theme-pref', pref);
+    html.setAttribute('data-theme', resolveTheme(pref));
+    themeToggle.setAttribute('aria-label', `Theme: ${pref.charAt(0).toUpperCase()}${pref.slice(1)}`);
+  };
+
+  applyTheme(themePref);
 
   themeToggle.addEventListener('click', () => {
-    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('da-theme', next);
+    const next = THEME_ORDER[(THEME_ORDER.indexOf(themePref) + 1) % THEME_ORDER.length];
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  });
+
+  prefersDarkMQ.addEventListener('change', () => {
+    if (themePref === 'system') applyTheme('system');
   });
 
   const showToast = (message, type = 'info', icon = 'fa-circle-info') => {
